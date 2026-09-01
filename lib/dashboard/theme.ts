@@ -13,8 +13,10 @@ export const BORDER = "#ECEAE7"
 export const MUTED = "#6B6459"
 export const FAINT = "#C9C3B7"
 
-// Fixa (não segue o tema do host) — verde/azul/vermelho evitam colisão de daltonismo com o laranja.
+// Fixa (não segue o tema do host) — verde/azul/vermelho/violeta evitam colisão de
+// daltonismo com o laranja (validado com o script do design system contra a paleta inteira).
 export const STATUS_GOOD = "#1E8E5A"
 export const STATUS_INFO = "#2563C7"
 export const STATUS_CRITICAL = "#C4362B"
+export const STATUS_WARNING = "#7C4DFF"
 export const STATUS_NEUTRAL = "#9A9284"
