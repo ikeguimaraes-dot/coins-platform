@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, disabled: false },
   { href: "/empresas", label: "Empresas", icon: Building2, disabled: false },
   { href: "/parceiros", label: "Parceiros", icon: Store, disabled: false },
-  { href: "/ofertas", label: "Ofertas", icon: Tag, disabled: true },
+  { href: "/ofertas", label: "Ofertas", icon: Tag, disabled: false },
 ] as const
 
 export function Sidebar() {
