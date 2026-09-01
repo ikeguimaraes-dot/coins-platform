@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react"
 
 import { OrganizationStatusBadge } from "@/components/organizations/organization-status-badge"
 import { formatInt } from "@/lib/dashboard/format"
-import { maskCnpj } from "@/lib/organizations/cnpj"
+import { maskCnpj } from "@/lib/format/cnpj"
 import { formatConversionRate } from "@/lib/organizations/rate"
 import type { OrganizationListItem } from "@/lib/api/organizations"
 

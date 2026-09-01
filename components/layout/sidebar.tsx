@@ -10,7 +10,7 @@ import { BRAND, BRAND_ACTION, BRAND_TINT } from "@/lib/dashboard/theme"
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, disabled: false },
   { href: "/empresas", label: "Empresas", icon: Building2, disabled: false },
-  { href: "/parceiros", label: "Parceiros", icon: Store, disabled: true },
+  { href: "/parceiros", label: "Parceiros", icon: Store, disabled: false },
   { href: "/ofertas", label: "Ofertas", icon: Tag, disabled: true },
 ] as const
 

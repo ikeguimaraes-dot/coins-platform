@@ -15,7 +15,7 @@ import { useCountUp } from "@/hooks/use-count-up"
 import { ApiError } from "@/lib/api/client"
 import { getOrganization } from "@/lib/api/organizations"
 import { BRAND_ACTION } from "@/lib/dashboard/theme"
-import { maskCnpj } from "@/lib/organizations/cnpj"
+import { maskCnpj } from "@/lib/format/cnpj"
 
 function StatCard({
   label,

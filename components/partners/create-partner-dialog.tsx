@@ -4,7 +4,6 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Check, Copy } from "lucide-react"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
@@ -18,26 +17,31 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { PartnerPasswordReveal } from "@/components/partners/partner-password-reveal"
 import { ApiError } from "@/lib/api/client"
-import { createOrganization, type CreateOrganizationResponse } from "@/lib/api/organizations"
+import { createPartner, type CreatePartnerResponse } from "@/lib/api/partners"
 import { isValidCnpj, maskCnpj, unmaskCnpj } from "@/lib/format/cnpj"
+import { percentToBps } from "@/lib/partners/rate"
 
 const schema = z.object({
-  name: z.string().min(1, "Informe o nome da empresa"),
+  name: z.string().min(1, "Informe o nome do parceiro"),
   cnpj: z.string().min(1, "Informe o CNPJ").refine(isValidCnpj, "CNPJ inválido"),
-  ownerEmail: z.string().min(1, "Informe o e-mail do responsável").email("E-mail inválido"),
-  coinsPerReal: z.string().optional(),
+  category: z.string().min(1, "Informe a categoria"),
+  contactEmail: z.string().min(1, "Informe o e-mail de login").email("E-mail inválido"),
+  contactPhone: z.string().optional(),
+  pixKey: z.string().min(1, "Informe a chave PIX"),
+  takeRate: z
+    .string()
+    .min(1, "Informe a taxa")
+    .refine((value) => {
+      const normalized = Number(value.replace(",", "."))
+      return Number.isFinite(normalized) && normalized >= 0
+    }, "Taxa inválida"),
 })
 
 type FormValues = z.infer<typeof schema>
 
-function parseRate(value: string | undefined): number | undefined {
-  if (!value || value.trim() === "") return undefined
-  const normalized = Number(value.replace(",", "."))
-  return Number.isFinite(normalized) && normalized > 0 ? normalized : undefined
-}
-
-export function CreateOrganizationDialog({
+export function CreatePartnerDialog({
   open,
   onOpenChange,
 }: {
@@ -45,23 +49,22 @@ export function CreateOrganizationDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const queryClient = useQueryClient()
-  const [result, setResult] = React.useState<CreateOrganizationResponse | null>(null)
-  const [copied, setCopied] = React.useState(false)
+  const [result, setResult] = React.useState<CreatePartnerResponse | null>(null)
   const [formError, setFormError] = React.useState<string | null>(null)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", cnpj: "", ownerEmail: "", coinsPerReal: "" },
+    defaultValues: { name: "", cnpj: "", category: "", contactEmail: "", contactPhone: "", pixKey: "", takeRate: "" },
   })
 
   const mutation = useMutation({
-    mutationFn: createOrganization,
+    mutationFn: createPartner,
     onSuccess: (data) => {
       setResult(data)
-      queryClient.invalidateQueries({ queryKey: ["organizations"] })
+      queryClient.invalidateQueries({ queryKey: ["partners"] })
     },
     onError: (error) => {
-      setFormError(error instanceof ApiError ? error.message : "Não foi possível criar a empresa.")
+      setFormError(error instanceof ApiError ? error.message : "Não foi possível criar o parceiro.")
     },
   })
 
@@ -72,7 +75,6 @@ export function CreateOrganizationDialog({
         form.reset()
         setResult(null)
         setFormError(null)
-        setCopied(false)
       }, 200)
     }
   }
@@ -82,17 +84,13 @@ export function CreateOrganizationDialog({
     mutation.mutate({
       name: values.name,
       cnpj: unmaskCnpj(values.cnpj),
-      ownerEmail: values.ownerEmail,
-      coinsPerReal: parseRate(values.coinsPerReal),
+      category: values.category,
+      contactEmail: values.contactEmail,
+      contactPhone: values.contactPhone || undefined,
+      pixKey: values.pixKey,
+      takeRateBps: percentToBps(Number(values.takeRate.replace(",", "."))),
     })
   })
-
-  async function handleCopy() {
-    if (!result) return
-    await navigator.clipboard.writeText(result.invite.inviteLink)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -100,21 +98,12 @@ export function CreateOrganizationDialog({
         {result ? (
           <>
             <DialogHeader>
-              <DialogTitle>Empresa criada com sucesso</DialogTitle>
+              <DialogTitle>Parceiro criado com sucesso</DialogTitle>
               <DialogDescription>
-                Envie este link para o responsável da empresa. Ele vai usá-lo pra criar a senha e acessar o painel.
+                Guarde e envie esta senha ao parceiro por um canal seguro. Ela não será mostrada novamente.
               </DialogDescription>
             </DialogHeader>
-            <div className="rounded-xl border bg-[#FFF1EA] p-4">
-              <p className="mb-3 break-all font-mono text-[12.5px] text-foreground">{result.invite.inviteLink}</p>
-              <Button type="button" size="sm" onClick={handleCopy} className="bg-[#C63C0B] hover:bg-[#B23509]">
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                {copied ? "Copiado!" : "Copiar link"}
-              </Button>
-            </div>
-            <p className="text-[12px] text-muted-foreground">
-              Expira em {new Date(result.invite.expiresAt).toLocaleString("pt-BR")}
-            </p>
+            <PartnerPasswordReveal password={result.credential.password} />
             <DialogFooter>
               <Button type="button" onClick={() => handleOpenChange(false)}>
                 Concluir
@@ -124,8 +113,8 @@ export function CreateOrganizationDialog({
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Nova empresa</DialogTitle>
-              <DialogDescription>Cadastre a empresa-cliente e convide o responsável pra criar a senha.</DialogDescription>
+              <DialogTitle>Novo parceiro</DialogTitle>
+              <DialogDescription>Cadastre o parceiro e gere a credencial de acesso ao portal.</DialogDescription>
             </DialogHeader>
             <Form {...form}>
               <form onSubmit={onSubmit} className="grid gap-4">
@@ -134,7 +123,7 @@ export function CreateOrganizationDialog({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nome da empresa</FormLabel>
+                      <FormLabel>Nome do parceiro</FormLabel>
                       <FormControl>
                         <Input {...field} autoComplete="off" />
                       </FormControl>
@@ -162,10 +151,23 @@ export function CreateOrganizationDialog({
                 />
                 <FormField
                   control={form.control}
-                  name="ownerEmail"
+                  name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>E-mail do responsável</FormLabel>
+                      <FormLabel>Categoria</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Posto de combustível" autoComplete="off" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contactEmail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>E-mail de login</FormLabel>
                       <FormControl>
                         <Input {...field} type="email" autoComplete="off" />
                       </FormControl>
@@ -175,14 +177,39 @@ export function CreateOrganizationDialog({
                 />
                 <FormField
                   control={form.control}
-                  name="coinsPerReal"
+                  name="contactPhone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Taxa de conversão (opcional)</FormLabel>
+                      <FormLabel>Telefone de contato (opcional)</FormLabel>
                       <FormControl>
-                        <Input {...field} inputMode="decimal" placeholder="1,25" />
+                        <Input {...field} autoComplete="off" />
                       </FormControl>
-                      <p className="text-[12px] text-muted-foreground">Padrão da plataforma se deixar em branco.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="pixKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chave PIX</FormLabel>
+                      <FormControl>
+                        <Input {...field} autoComplete="off" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="takeRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Taxa da plataforma (%)</FormLabel>
+                      <FormControl>
+                        <Input {...field} inputMode="decimal" placeholder="2,5" />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -190,7 +217,7 @@ export function CreateOrganizationDialog({
                 {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
                 <DialogFooter>
                   <Button type="submit" disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-                    {mutation.isPending ? "Criando..." : "Criar empresa"}
+                    {mutation.isPending ? "Criando..." : "Criar parceiro"}
                   </Button>
                 </DialogFooter>
               </form>
