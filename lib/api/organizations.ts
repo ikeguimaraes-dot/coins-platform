@@ -13,10 +13,11 @@ export type OrganizationsPage = {
   nextCursor: string | null
 }
 
-export function listOrganizations(params: { cursor?: string; limit?: number } = {}) {
+export function listOrganizations(params: { cursor?: string; limit?: number; q?: string } = {}) {
   const query = new URLSearchParams()
   if (params.cursor) query.set("cursor", params.cursor)
   if (params.limit) query.set("limit", String(params.limit))
+  if (params.q) query.set("q", params.q)
   const qs = query.toString()
   return apiClient.get<OrganizationsPage>(`/platform/organizations${qs ? `?${qs}` : ""}`)
 }

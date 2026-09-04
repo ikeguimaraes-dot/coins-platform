@@ -1,27 +1,33 @@
 "use client"
 
 import * as React from "react"
-import { useInfiniteQuery } from "@tanstack/react-query"
-import { Plus } from "lucide-react"
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query"
+import { Plus, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { CreateOrganizationDialog } from "@/components/organizations/create-organization-dialog"
 import { OrganizationRow } from "@/components/organizations/organization-row"
 import { OrganizationsSkeleton } from "@/components/organizations/organizations-skeleton"
 import { DashboardError } from "@/components/dashboard/dashboard-error"
+import { useDebouncedValue } from "@/hooks/use-debounced-value"
 import { listOrganizations } from "@/lib/api/organizations"
 
 const PAGE_SIZE = 20
 
 export function OrganizationsView() {
   const [createOpen, setCreateOpen] = React.useState(false)
+  const [searchInput, setSearchInput] = React.useState("")
+  const debouncedSearch = useDebouncedValue(searchInput, 300)
+  const query = debouncedSearch.trim()
 
   const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ["organizations"],
+    queryKey: ["organizations", query],
     queryFn: ({ pageParam }: { pageParam: string | undefined }) =>
-      listOrganizations({ cursor: pageParam, limit: PAGE_SIZE }),
+      listOrganizations({ cursor: pageParam, limit: PAGE_SIZE, q: query || undefined }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+    placeholderData: keepPreviousData,
   })
 
   const items = data?.pages.flatMap((page) => page.items) ?? []
@@ -44,21 +50,40 @@ export function OrganizationsView() {
         </Button>
       </div>
 
+      <div className="relative max-w-sm">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={searchInput}
+          onChange={(event) => setSearchInput(event.target.value)}
+          placeholder="Buscar empresa por nome..."
+          className="pl-9"
+        />
+      </div>
+
       {isPending ? (
         <OrganizationsSkeleton />
       ) : isError ? (
         <DashboardError onRetry={() => refetch()} />
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border bg-muted/20 px-6 py-16 text-center">
-          <h3 className="font-serif text-[17px] font-semibold">Nenhuma empresa ainda</h3>
-          <p className="max-w-[40ch] text-[13.5px] text-muted-foreground">
-            Crie a primeira empresa-cliente da plataforma pra começar a distribuir coins.
-          </p>
-          <Button onClick={() => setCreateOpen(true)} className="mt-1 bg-[#C63C0B] hover:bg-[#B23509]">
-            <Plus className="h-4 w-4" />
-            Nova empresa
-          </Button>
-        </div>
+        query ? (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border bg-muted/20 px-6 py-16 text-center">
+            <h3 className="font-serif text-[17px] font-semibold">Nenhuma empresa encontrada</h3>
+            <p className="max-w-[40ch] text-[13.5px] text-muted-foreground">
+              Não encontramos nenhuma empresa com &quot;{query}&quot; no nome.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border bg-muted/20 px-6 py-16 text-center">
+            <h3 className="font-serif text-[17px] font-semibold">Nenhuma empresa ainda</h3>
+            <p className="max-w-[40ch] text-[13.5px] text-muted-foreground">
+              Crie a primeira empresa-cliente da plataforma pra começar a distribuir coins.
+            </p>
+            <Button onClick={() => setCreateOpen(true)} className="mt-1 bg-[#C63C0B] hover:bg-[#B23509]">
+              <Plus className="h-4 w-4" />
+              Nova empresa
+            </Button>
+          </div>
+        )
       ) : (
         <>
           <div className="rounded-2xl border bg-background px-4">

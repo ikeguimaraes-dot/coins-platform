@@ -283,7 +283,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Lista todas as organizações da plataforma, paginado por cursor */
+        /** Lista todas as organizações da plataforma, paginado por cursor — q opcional busca parcial no nome, case-insensitive */
         get: operations["PlatformOrganizationsController_list"];
         put?: never;
         /** Cria uma organização cliente + convite de OWNER (mesmo fluxo do bootstrap-owner) */
@@ -726,6 +726,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ranking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top 10 de coins ganhos por distribuição no mês (ou período informado) na organização */
+        get: operations["RankingController_getRanking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/signup": {
         parameters: {
             query?: never;
@@ -769,15 +786,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Envia o código de acesso por e-mail pro CPF de uma conta já existente */
-        post: operations["LoginController_requestOtp"];
+        /** Login por CPF + senha — retorna a sessão direto, sem OTP */
+        post: operations["LoginController_login"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/users/login/verify": {
+    "/users/password/recovery": {
         parameters: {
             query?: never;
             header?: never;
@@ -786,8 +803,25 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Confirma o código e retorna a sessão — sem vínculo com organização */
-        post: operations["LoginController_verify"];
+        /** Envia um código por e-mail pra redefinir a senha — serve tanto pra recuperar quanto pra definir a primeira senha */
+        post: operations["PasswordRecoveryController_requestRecovery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/password/recovery/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirma o código, define a nova senha e retorna a sessão */
+        post: operations["PasswordRecoveryController_confirmRecovery"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1270,8 +1304,7 @@ export interface components {
             timestamp: string;
         };
         LoginDto: {
-            /** Format: email */
-            email: string;
+            cpf: string;
             password: string;
         };
         LoginResponseDto: {
@@ -1871,6 +1904,18 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        RankingResponseDto: {
+            items: {
+                position: number;
+                name: string;
+                coinsEarned: number;
+            }[];
+            currentUser: {
+                position: number;
+                coinsEarned: number;
+            };
+            period: string;
+        };
         RequestSignupDto: {
             cpf: string;
             name: string;
@@ -1885,6 +1930,7 @@ export interface components {
         VerifySignupDto: {
             cpf: string;
             code: string;
+            password: string;
         };
         UserTokenPairResponseDto: {
             accessToken: string;
@@ -1893,12 +1939,13 @@ export interface components {
             tokenType: "Bearer";
             expiresIn: number;
         };
-        RequestLoginDto: {
+        RequestPasswordRecoveryDto: {
             cpf: string;
         };
-        VerifyLoginDto: {
+        ConfirmPasswordRecoveryDto: {
             cpf: string;
             code: string;
+            newPassword: string;
         };
         RegisterDeviceDto: {
             fingerprint: string;
@@ -2669,6 +2716,7 @@ export interface operations {
             query?: {
                 cursor?: string;
                 limit?: number;
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -3421,6 +3469,28 @@ export interface operations {
             };
         };
     };
+    RankingController_getRanking: {
+        parameters: {
+            query: {
+                organizationId: string;
+                period?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankingResponseDto"];
+                };
+            };
+        };
+    };
     SignupController_requestOtp: {
         parameters: {
             query?: never;
@@ -3467,7 +3537,7 @@ export interface operations {
             };
         };
     };
-    LoginController_requestOtp: {
+    LoginController_login: {
         parameters: {
             query?: never;
             header?: never;
@@ -3476,7 +3546,30 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RequestLoginDto"];
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
+                };
+            };
+        };
+    };
+    PasswordRecoveryController_requestRecovery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestPasswordRecoveryDto"];
             };
         };
         responses: {
@@ -3490,7 +3583,7 @@ export interface operations {
             };
         };
     };
-    LoginController_verify: {
+    PasswordRecoveryController_confirmRecovery: {
         parameters: {
             query?: never;
             header?: never;
@@ -3499,7 +3592,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VerifyLoginDto"];
+                "application/json": components["schemas"]["ConfirmPasswordRecoveryDto"];
             };
         };
         responses: {
