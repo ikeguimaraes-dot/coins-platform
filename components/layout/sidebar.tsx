@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Building2, LayoutDashboard, Store, Tag } from "lucide-react"
+import { Building2, Inbox, LayoutDashboard, Store, Tag } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { BRAND, BRAND_ACTION, BRAND_TINT } from "@/lib/dashboard/theme"
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, disabled: false },
+  { href: "/pedidos", label: "Pedidos", icon: Inbox, disabled: false },
   { href: "/empresas", label: "Empresas", icon: Building2, disabled: false },
   { href: "/parceiros", label: "Parceiros", icon: Store, disabled: false },
   { href: "/ofertas", label: "Ofertas", icon: Tag, disabled: false },

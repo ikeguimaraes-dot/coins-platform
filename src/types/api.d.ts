@@ -572,25 +572,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/organizations/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Dados da organização do chamador */
-        get: operations["OrganizationsController_getMyOrganization"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Atualiza nome/plano da organização (somente OWNER) */
-        patch: operations["OrganizationsController_updateMyOrganization"];
-        trace?: never;
-    };
-    "/organizations/admins/invites": {
+    "/platform/redemptions/deliver": {
         parameters: {
             query?: never;
             header?: never;
@@ -599,32 +581,50 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Convida um novo AdminUser pra organização do chamador */
-        post: operations["AdminInvitesController_invite"];
+        /** Marca um resgate como entregue (redemptionId, pickupCode ou qrPayload) — sem restrição de parceiro dono, idempotente */
+        post: operations["PlatformRedemptionsController_deliver"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/organizations/admins/invites/{token}/accept": {
+    "/redemptions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** Lista os resgates do usuário autenticado numa organização, paginado por cursor */
+        get: operations["RedemptionsController_list"];
         put?: never;
-        /** Aceita um convite e define a senha — cria o AdminUser. Pra OWNER/MANAGER devolve MFA_SETUP_REQUIRED em vez de sessão (MFA é obrigatório antes de qualquer token válido). */
-        post: operations["AdminInvitesController_accept"];
+        /** Compra um item com coins — exige PIN de transação, debita imediatamente e devolve o resgate já CONFIRMED com código de retirada + QR */
+        post: operations["RedemptionsController_create"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/organizations/admins/{id}/role": {
+    "/redemptions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulta um resgate já feito — código de retirada, QR e status de entrega */
+        get: operations["RedemptionsController_getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/redemptions/confirm": {
         parameters: {
             query?: never;
             header?: never;
@@ -633,15 +633,83 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        /** Marca um resgate como entregue (pickupCode OU qrPayload) — idempotente, chamar de novo num resgate já entregue não é erro */
+        post: operations["PartnerRedemptionsController_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Saldo da wallet do usuário na organização informada + coins a expirar */
+        get: operations["WalletsController_getWallet"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        /** Troca o papel de um AdminUser da organização (somente OWNER) */
-        patch: operations["AdminInvitesController_changeRole"];
+        patch?: never;
         trace?: never;
     };
-    "/organizations/admins/{id}/deactivate": {
+    "/wallet/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Extrato da wallet, paginado por cursor */
+        get: operations["WalletsController_getEntries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Organizações e saldos do usuário autenticado — pra escolher qual carteira ver */
+        get: operations["MembershipsController_listMemberships"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet/transfer/recipients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca membros ACTIVE da mesma organização por nome (parcial) pra escolher destinatário */
+        get: operations["TransferController_searchRecipients"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet/transfer": {
         parameters: {
             query?: never;
             header?: never;
@@ -650,25 +718,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Desativa um AdminUser de rank inferior ao do chamador */
-        patch: operations["AdminInvitesController_deactivate"];
-        trace?: never;
-    };
-    "/organizations/audit-log": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulta o audit log da organização do chamador, com filtros */
-        get: operations["AuditLogController_list"];
-        put?: never;
-        post?: never;
+        /** Transfere coins pra outro membro da mesma organização — exige PIN de transação, limite de 1000 coins/dia por usuário */
+        post: operations["TransferController_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -684,7 +735,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Inicia o cadastro (ou o claim de uma conta pendente) e envia o código por e-mail */
+        /** Inicia o claim de uma conta pendente (criada por distribuição) e envia o código por e-mail */
         post: operations["SignupController_requestOtp"];
         delete?: never;
         options?: never;
@@ -819,7 +870,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Dados do usuário autenticado — nome, e-mail, CPF mascarado, preferência de notificação */
+        /** Dados do usuário autenticado — nome, e-mail, CPF mascarado, preferência de notificação, se já tem PIN de transação */
         get: operations["MeController_getMe"];
         put?: never;
         post?: never;
@@ -829,15 +880,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wallet": {
+    "/users/me/transaction-pin": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Saldo da wallet do usuário na organização informada + coins a expirar */
-        get: operations["WalletsController_getWallet"];
+        get?: never;
+        put?: never;
+        /** Define ou troca o PIN de transação (4-6 dígitos) — exigido em POST /redemptions */
+        post: operations["MeController_setTransactionPin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/batches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista pedidos de lote de todas as organizações, com filtro opcional por status, paginado por cursor */
+        get: operations["PlatformBatchesController_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -846,32 +914,135 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wallet/entries": {
+    "/platform/batches/{id}/approve": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Extrato da wallet, paginado por cursor */
-        get: operations["WalletsController_getEntries"];
+        get?: never;
         put?: never;
-        post?: never;
+        /** Aprova um pedido de lote (marca como pago) — libera o estoque de coins da organização, idempotente */
+        post: operations["PlatformBatchesController_approve"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/memberships": {
+    "/platform/batches/{id}/reject": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Organizações e saldos do usuário autenticado — pra escolher qual carteira ver */
-        get: operations["MembershipsController_listMemberships"];
+        get?: never;
+        put?: never;
+        /** Recusa um pedido de lote, com motivo opcional, idempotente */
+        post: operations["PlatformBatchesController_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dados da organização do chamador */
+        get: operations["OrganizationsController_getMyOrganization"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Atualiza nome/plano da organização (somente OWNER) */
+        patch: operations["OrganizationsController_updateMyOrganization"];
+        trace?: never;
+    };
+    "/organizations/admins/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Convida um novo AdminUser pra organização do chamador */
+        post: operations["AdminInvitesController_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/admins/invites/{token}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aceita um convite e define a senha — cria o AdminUser. Pra OWNER/MANAGER devolve MFA_SETUP_REQUIRED em vez de sessão (MFA é obrigatório antes de qualquer token válido). */
+        post: operations["AdminInvitesController_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/organizations/admins/{id}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Troca o papel de um AdminUser da organização (somente OWNER) */
+        patch: operations["AdminInvitesController_changeRole"];
+        trace?: never;
+    };
+    "/organizations/admins/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Desativa um AdminUser de rank inferior ao do chamador */
+        patch: operations["AdminInvitesController_deactivate"];
+        trace?: never;
+    };
+    "/organizations/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Consulta o audit log da organização do chamador, com filtros */
+        get: operations["AuditLogController_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1080,57 +1251,6 @@ export interface paths {
         get: operations["OffersController_getById"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/redemptions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Cria um resgate PENDING (código + QR, TTL 5min) — nada é debitado ainda */
-        post: operations["RedemptionsController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/redemptions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Consulta um resgate — usado pelo app pra polling aguardando confirmação */
-        get: operations["RedemptionsController_getById"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/redemptions/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Confirma um resgate (code OU qrPayload) — só aqui o débito acontece */
-        post: operations["PartnerRedemptionsController_confirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1631,6 +1751,221 @@ export interface components {
                 }[];
             };
         };
+        DeliverRedemptionDto: {
+            redemptionId?: string;
+            pickupCode?: string;
+            qrPayload?: string;
+        };
+        RedemptionResponseDto: {
+            id: string;
+            partnerId: string;
+            offerId: string | null;
+            amount: number;
+            pickupCode: string;
+            qrPayload: string;
+            /** @enum {string} */
+            status: "CONFIRMED" | "DELIVERED";
+            /** Format: date-time */
+            confirmedAt: string | null;
+            /** Format: date-time */
+            deliveredAt: string | null;
+        };
+        CreateRedemptionDto: {
+            offerId: string;
+            organizationId: string;
+            transactionPin: string;
+        };
+        RedemptionListResponseDto: {
+            items: {
+                id: string;
+                /** @enum {string} */
+                status: "CONFIRMED" | "DELIVERED";
+                pickupCode: string;
+                qrPayload: string;
+                amount: number;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                confirmedAt: string | null;
+                /** Format: date-time */
+                deliveredAt: string | null;
+                offerTitle: string | null;
+                partnerName: string;
+            }[];
+            nextCursor: string | null;
+        };
+        ConfirmRedemptionDto: {
+            pickupCode?: string;
+            qrPayload?: string;
+        };
+        PartnerRedemptionConfirmResponseDto: {
+            id: string;
+            amount: number;
+            /** @enum {string} */
+            status: "CONFIRMED" | "DELIVERED";
+            /** Format: date-time */
+            confirmedAt: string | null;
+            /** Format: date-time */
+            deliveredAt: string | null;
+            offerTitle: string | null;
+            customerFirstName: string;
+        };
+        WalletResponseDto: {
+            walletId: string;
+            cachedBalance: number;
+            totalEarned: number;
+            totalSpent: number;
+            expiring: {
+                batchId: string;
+                amount: number;
+                /** Format: date-time */
+                expiresAt: string;
+            }[];
+        };
+        LedgerEntryListResponseDto: {
+            items: {
+                id: string;
+                walletId: string;
+                /** @enum {string} */
+                type: "CREDIT" | "DEBIT" | "REVERSAL" | "EXPIRE";
+                amount: number;
+                balanceAfter: number;
+                /** @enum {string} */
+                referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER";
+                referenceId: string;
+                batchId: string | null;
+                distributionItemId: string | null;
+                description: string;
+                reversalOfId: string | null;
+                /** Format: date-time */
+                createdAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        MembershipListResponseDto: {
+            organizationId: string;
+            organizationName: string;
+            /** @enum {string} */
+            membershipType: "CUSTOMER" | "EMPLOYEE";
+            /** @enum {string} */
+            membershipStatus: "ACTIVE" | "INACTIVE";
+            walletBalance: number;
+        }[];
+        RecipientListResponseDto: {
+            items: {
+                membershipId: string;
+                name: string;
+            }[];
+        };
+        CreateTransferDto: {
+            organizationId: string;
+            recipientMembershipId: string;
+            amount: number;
+            transactionPin: string;
+        };
+        TransferResponseDto: {
+            id: string;
+            amount: number;
+            recipientMembershipId: string;
+            recipientName: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        RequestSignupDto: {
+            cpf: string;
+            name: string;
+            /** Format: email */
+            email: string;
+            phone?: string;
+        };
+        RequestOtpResponseDto: {
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        VerifySignupDto: {
+            cpf: string;
+            code: string;
+        };
+        UserTokenPairResponseDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** @enum {string} */
+            tokenType: "Bearer";
+            expiresIn: number;
+        };
+        RequestLoginDto: {
+            cpf: string;
+        };
+        VerifyLoginDto: {
+            cpf: string;
+            code: string;
+        };
+        RegisterDeviceDto: {
+            fingerprint: string;
+            pushToken?: string;
+        };
+        DeviceResponseDto: {
+            id: string;
+            fingerprint: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        NotificationPreferencesResponseDto: {
+            notificationsEnabled: boolean;
+        };
+        UpdateNotificationPreferencesDto: {
+            notificationsEnabled: boolean;
+        };
+        RefreshTokenDto: {
+            refreshToken: string;
+        };
+        MeResponseDto: {
+            id: string;
+            name: string;
+            email: string | null;
+            cpfMasked: string;
+            notificationsEnabled: boolean;
+            hasTransactionPin: boolean;
+        };
+        SetTransactionPinDto: {
+            pin: string;
+        };
+        PlatformBatchListResponseDto: {
+            items: {
+                id: string;
+                organizationId: string;
+                organizationName: string;
+                totalCoins: number;
+                priceInCents: number;
+                /** @enum {string} */
+                status: "PENDING" | "PAID" | "REJECTED" | "EXPIRED" | "CANCELED";
+                rejectionReason: string | null;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        PlatformBatchItemDto: {
+            id: string;
+            organizationId: string;
+            organizationName: string;
+            totalCoins: number;
+            priceInCents: number;
+            /** @enum {string} */
+            status: "PENDING" | "PAID" | "REJECTED" | "EXPIRED" | "CANCELED";
+            rejectionReason: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        RejectBatchDto: {
+            reason?: string;
+        };
         OrganizationResponseDto: {
             id: string;
             name: string;
@@ -1705,108 +2040,6 @@ export interface components {
             }[];
             nextCursor: string | null;
         };
-        RequestSignupDto: {
-            cpf: string;
-            name: string;
-            /** Format: email */
-            email: string;
-            phone?: string;
-            organizationId?: string;
-            /** @enum {string} */
-            membershipType?: "CUSTOMER" | "EMPLOYEE";
-            externalRef?: string;
-        };
-        RequestOtpResponseDto: {
-            /** Format: date-time */
-            expiresAt: string;
-        };
-        VerifySignupDto: {
-            cpf: string;
-            code: string;
-        };
-        UserTokenPairResponseDto: {
-            accessToken: string;
-            refreshToken: string;
-            /** @enum {string} */
-            tokenType: "Bearer";
-            expiresIn: number;
-        };
-        RequestLoginDto: {
-            cpf: string;
-        };
-        VerifyLoginDto: {
-            cpf: string;
-            code: string;
-        };
-        RegisterDeviceDto: {
-            fingerprint: string;
-            pushToken?: string;
-        };
-        DeviceResponseDto: {
-            id: string;
-            fingerprint: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        NotificationPreferencesResponseDto: {
-            notificationsEnabled: boolean;
-        };
-        UpdateNotificationPreferencesDto: {
-            notificationsEnabled: boolean;
-        };
-        RefreshTokenDto: {
-            refreshToken: string;
-        };
-        MeResponseDto: {
-            id: string;
-            name: string;
-            email: string | null;
-            cpfMasked: string;
-            notificationsEnabled: boolean;
-        };
-        WalletResponseDto: {
-            walletId: string;
-            cachedBalance: number;
-            totalEarned: number;
-            totalSpent: number;
-            expiring: {
-                batchId: string;
-                amount: number;
-                /** Format: date-time */
-                expiresAt: string;
-            }[];
-        };
-        LedgerEntryListResponseDto: {
-            items: {
-                id: string;
-                walletId: string;
-                /** @enum {string} */
-                type: "CREDIT" | "DEBIT" | "REVERSAL" | "EXPIRE";
-                amount: number;
-                balanceAfter: number;
-                /** @enum {string} */
-                referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL";
-                referenceId: string;
-                batchId: string | null;
-                distributionItemId: string | null;
-                description: string;
-                reversalOfId: string | null;
-                /** Format: date-time */
-                createdAt: string;
-            }[];
-            nextCursor: string | null;
-        };
-        MembershipListResponseDto: {
-            organizationId: string;
-            organizationName: string;
-            /** @enum {string} */
-            membershipType: "CUSTOMER" | "EMPLOYEE";
-            /** @enum {string} */
-            membershipStatus: "ACTIVE" | "INACTIVE";
-            walletBalance: number;
-        }[];
         CreateBatchDto: {
             totalCoins: number;
             /** @default 12 */
@@ -1820,7 +2053,8 @@ export interface components {
                 remainingCoins: number;
                 priceInCents: number;
                 /** @enum {string} */
-                status: "PENDING" | "PAID" | "EXPIRED" | "CANCELED";
+                status: "PENDING" | "PAID" | "REJECTED" | "EXPIRED" | "CANCELED";
+                rejectionReason: string | null;
                 /** Format: date-time */
                 expiresAt: string;
                 /** Format: date-time */
@@ -1828,11 +2062,18 @@ export interface components {
                 /** Format: date-time */
                 updatedAt: string;
             };
-            pix: {
+            pix: ({
+                /** @enum {string} */
+                method: "ASAAS";
                 qrCodeImage: string;
                 copyPasteCode: string;
                 expirationDate: string;
-            } | null;
+            } | {
+                /** @enum {string} */
+                method: "MANUAL";
+                pixKey: string;
+                amountInCents: number;
+            }) | null;
         };
         ListBatchesResponseDto: {
             items: {
@@ -1842,7 +2083,8 @@ export interface components {
                 remainingCoins: number;
                 priceInCents: number;
                 /** @enum {string} */
-                status: "PENDING" | "PAID" | "EXPIRED" | "CANCELED";
+                status: "PENDING" | "PAID" | "REJECTED" | "EXPIRED" | "CANCELED";
+                rejectionReason: string | null;
                 /** Format: date-time */
                 expiresAt: string;
                 /** Format: date-time */
@@ -1900,7 +2142,7 @@ export interface components {
                     amount: number;
                     balanceAfter: number;
                     /** @enum {string} */
-                    referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL";
+                    referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER";
                     referenceId: string;
                     batchId: string | null;
                     distributionItemId: string | null;
@@ -2068,38 +2310,6 @@ export interface components {
                 name: string;
                 category: string;
             };
-        };
-        CreateRedemptionDto: {
-            offerId: string;
-            organizationId: string;
-        };
-        RedemptionResponseDto: {
-            id: string;
-            partnerId: string;
-            offerId: string | null;
-            amount: number;
-            code: string;
-            qrPayload: string;
-            /** @enum {string} */
-            status: "PENDING" | "CONFIRMED" | "EXPIRED";
-            /** Format: date-time */
-            expiresAt: string;
-            /** Format: date-time */
-            confirmedAt: string | null;
-        };
-        ConfirmRedemptionDto: {
-            code?: string;
-            qrPayload?: string;
-        };
-        PartnerRedemptionConfirmResponseDto: {
-            id: string;
-            amount: number;
-            /** @enum {string} */
-            status: "PENDING" | "CONFIRMED" | "EXPIRED";
-            /** Format: date-time */
-            confirmedAt: string | null;
-            offerTitle: string | null;
-            customerFirstName: string;
         };
     };
     responses: never;
@@ -2986,26 +3196,7 @@ export interface operations {
             };
         };
     };
-    OrganizationsController_getMyOrganization: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OrganizationResponseDto"];
-                };
-            };
-        };
-    };
-    OrganizationsController_updateMyOrganization: {
+    PlatformRedemptionsController_deliver: {
         parameters: {
             query?: never;
             header?: never;
@@ -3014,7 +3205,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateOrganizationDto"];
+                "application/json": components["schemas"]["DeliverRedemptionDto"];
             };
         };
         responses: {
@@ -3023,112 +3214,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrganizationResponseDto"];
+                    "application/json": components["schemas"]["RedemptionResponseDto"];
                 };
             };
         };
     };
-    AdminInvitesController_invite: {
+    RedemptionsController_list: {
         parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["InviteAdminDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["InviteResultResponseDto"];
-                };
-            };
-        };
-    };
-    AdminInvitesController_accept: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                token: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AcceptInviteDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AcceptInviteResponseDto"];
-                };
-            };
-        };
-    };
-    AdminInvitesController_changeRole: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangeRoleDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminProfileDto"];
-                };
-            };
-        };
-    };
-    AdminInvitesController_deactivate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminProfileDto"];
-                };
-            };
-        };
-    };
-    AuditLogController_list: {
-        parameters: {
-            query?: {
-                action?: string;
-                actorAdminUserId?: string;
-                from?: unknown;
-                to?: unknown;
+            query: {
+                organizationId: string;
                 cursor?: string;
                 limit?: number;
             };
@@ -3143,7 +3237,186 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuditLogListResponseDto"];
+                    "application/json": components["schemas"]["RedemptionListResponseDto"];
+                };
+            };
+        };
+    };
+    RedemptionsController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRedemptionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedemptionResponseDto"];
+                };
+            };
+        };
+    };
+    RedemptionsController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedemptionResponseDto"];
+                };
+            };
+        };
+    };
+    PartnerRedemptionsController_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmRedemptionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PartnerRedemptionConfirmResponseDto"];
+                };
+            };
+        };
+    };
+    WalletsController_getWallet: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletResponseDto"];
+                };
+            };
+        };
+    };
+    WalletsController_getEntries: {
+        parameters: {
+            query: {
+                organizationId: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LedgerEntryListResponseDto"];
+                };
+            };
+        };
+    };
+    MembershipsController_listMemberships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipListResponseDto"];
+                };
+            };
+        };
+    };
+    TransferController_searchRecipients: {
+        parameters: {
+            query: {
+                organizationId: string;
+                query: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecipientListResponseDto"];
+                };
+            };
+        };
+    };
+    TransferController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTransferDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransferResponseDto"];
                 };
             };
         };
@@ -3368,10 +3641,33 @@ export interface operations {
             };
         };
     };
-    WalletsController_getWallet: {
+    MeController_setTransactionPin: {
         parameters: {
-            query: {
-                organizationId: string;
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetTransactionPinDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformBatchesController_list: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+                status?: "PENDING" | "PAID" | "REJECTED" | "EXPIRED" | "CANCELED";
             };
             header?: never;
             path?: never;
@@ -3384,15 +3680,200 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WalletResponseDto"];
+                    "application/json": components["schemas"]["PlatformBatchListResponseDto"];
                 };
             };
         };
     };
-    WalletsController_getEntries: {
+    PlatformBatchesController_approve: {
         parameters: {
-            query: {
-                organizationId: string;
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBatchItemDto"];
+                };
+            };
+        };
+    };
+    PlatformBatchesController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectBatchDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBatchItemDto"];
+                };
+            };
+        };
+    };
+    OrganizationsController_getMyOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationsController_updateMyOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganizationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponseDto"];
+                };
+            };
+        };
+    };
+    AdminInvitesController_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteAdminDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InviteResultResponseDto"];
+                };
+            };
+        };
+    };
+    AdminInvitesController_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInviteDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptInviteResponseDto"];
+                };
+            };
+        };
+    };
+    AdminInvitesController_changeRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeRoleDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProfileDto"];
+                };
+            };
+        };
+    };
+    AdminInvitesController_deactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminProfileDto"];
+                };
+            };
+        };
+    };
+    AuditLogController_list: {
+        parameters: {
+            query?: {
+                action?: string;
+                actorAdminUserId?: string;
+                from?: unknown;
+                to?: unknown;
                 cursor?: string;
                 limit?: number;
             };
@@ -3407,26 +3888,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LedgerEntryListResponseDto"];
-                };
-            };
-        };
-    };
-    MembershipsController_listMemberships: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MembershipListResponseDto"];
+                    "application/json": components["schemas"]["AuditLogListResponseDto"];
                 };
             };
         };
@@ -3743,75 +4205,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OfferCatalogResponseDto"];
-                };
-            };
-        };
-    };
-    RedemptionsController_create: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateRedemptionDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RedemptionResponseDto"];
-                };
-            };
-        };
-    };
-    RedemptionsController_getById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RedemptionResponseDto"];
-                };
-            };
-        };
-    };
-    PartnerRedemptionsController_confirm: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConfirmRedemptionDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PartnerRedemptionConfirmResponseDto"];
                 };
             };
         };

@@ -1,18 +1,15 @@
 import { ActivityCard } from "@/components/dashboard/activity-card"
 import { centsToReais, formatBRL, formatInt, formatRelativeTime } from "@/lib/dashboard/format"
-import { STATUS_CRITICAL, STATUS_GOOD, STATUS_INFO, STATUS_NEUTRAL } from "@/lib/dashboard/theme"
+import { STATUS_GOOD, STATUS_NEUTRAL } from "@/lib/dashboard/theme"
+import { BATCH_STATUS } from "@/lib/batches/status"
 import type { PlatformDashboard } from "@/lib/api/dashboard"
-
-const BATCH_STATUS: Record<string, { label: string; color: string }> = {
-  PAID: { label: "Pago", color: STATUS_GOOD },
-  PENDING: { label: "Pendente", color: STATUS_INFO },
-  CANCELED: { label: "Cancelado", color: STATUS_CRITICAL },
-  EXPIRED: { label: "Expirado", color: STATUS_NEUTRAL },
-}
 
 export function ActivityRow({ recentActivity }: { recentActivity: PlatformDashboard["recentActivity"] }) {
   const batchItems = recentActivity.latestBatches.map((batch) => {
-    const status = BATCH_STATUS[batch.status] ?? { label: batch.status, color: STATUS_NEUTRAL }
+    const status = BATCH_STATUS[batch.status as keyof typeof BATCH_STATUS] ?? {
+      label: batch.status,
+      color: STATUS_NEUTRAL,
+    }
     return {
       id: batch.id,
       title: `${batch.organizationName} · ${formatInt(batch.totalCoins)} coins`,
