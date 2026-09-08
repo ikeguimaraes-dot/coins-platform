@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
-import { OfferImage } from "@/components/offers/offer-image"
+import { EntityImage } from "@/components/shared/entity-image"
 import { OfferStatusBadge } from "@/components/offers/offer-status-badge"
 import { formatInt } from "@/lib/dashboard/format"
 import { BRAND_ACTION } from "@/lib/dashboard/theme"
@@ -13,7 +13,7 @@ export function OfferRow({ offer }: { offer: OfferListItem }) {
       href={`/ofertas/${offer.id}`}
       className="flex items-center gap-4 border-t px-1 py-3.5 transition-colors first:border-t-0 hover:bg-muted/40"
     >
-      <OfferImage src={offer.imageUrl} alt={offer.title} size="thumb" />
+      <EntityImage src={offer.imageUrl} alt={offer.title} size="thumb" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate text-[14px] font-semibold">{offer.title}</span>

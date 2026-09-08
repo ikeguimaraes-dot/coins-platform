@@ -21,6 +21,381 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista os cursos publicados com o progresso do usuário */
+        get: operations["CoursesController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/courses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe de um curso — aulas e estado do quiz */
+        get: operations["CoursesController_getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/courses/{id}/lessons/{lessonId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Marca uma aula como assistida */
+        post: operations["CoursesController_completeLesson"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/courses/{id}/quiz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Questões e alternativas do quiz — nunca indica a correta */
+        get: operations["CoursesController_getQuiz"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/courses/{id}/quiz/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Corrige o quiz no servidor — se aprovado, credita os coins */
+        post: operations["CoursesController_submitQuiz"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Saldo da wallet do usuário na organização informada + coins a expirar */
+        get: operations["WalletsController_getWallet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Extrato da wallet, paginado por cursor */
+        get: operations["WalletsController_getEntries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Organizações e saldos do usuário autenticado — pra escolher qual carteira ver */
+        get: operations["MembershipsController_listMemberships"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet/transfer/recipients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Busca membros ACTIVE da mesma organização por nome (parcial) pra escolher destinatário */
+        get: operations["TransferController_searchRecipients"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallet/transfer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transfere coins pra outro membro da mesma organização — exige PIN de transação, limite de 1000 coins/dia por usuário */
+        post: operations["TransferController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ranking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top 10 de coins ganhos por distribuição no mês (ou período informado) na organização */
+        get: operations["RankingController_getRanking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inicia o claim de uma conta pendente (criada por distribuição) e envia o código por e-mail */
+        post: operations["SignupController_requestOtp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/signup/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirma o código — cria/promove User+Membership+Wallet e retorna sessão */
+        post: operations["SignupController_verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login por CPF + senha — retorna a sessão direto, sem OTP */
+        post: operations["LoginController_login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/password/recovery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Envia um código por e-mail pra redefinir a senha — serve tanto pra recuperar quanto pra definir a primeira senha */
+        post: operations["PasswordRecoveryController_requestRecovery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/password/recovery/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirma o código, define a nova senha e retorna a sessão */
+        post: operations["PasswordRecoveryController_confirmRecovery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Registra (ou atualiza) o device do usuário autenticado — upsert por fingerprint */
+        post: operations["DevicesController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/notification-preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preferência de notificação do usuário autenticado */
+        get: operations["NotificationPreferencesController_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Atualiza a preferência de notificação do usuário autenticado */
+        patch: operations["NotificationPreferencesController_update"];
+        trace?: never;
+    };
+    "/users/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Rotaciona o refresh token do usuário (detecta reuso) */
+        post: operations["RefreshController_refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Revoga o refresh token informado */
+        post: operations["RefreshController_logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dados do usuário autenticado — nome, e-mail, CPF mascarado, preferência de notificação, se já tem PIN de transação */
+        get: operations["MeController_getMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/me/transaction-pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Define ou troca o PIN de transação (4-6 dígitos) — exigido em POST /redemptions */
+        post: operations["MeController_setTransactionPin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -641,296 +1016,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wallet": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Saldo da wallet do usuário na organização informada + coins a expirar */
-        get: operations["WalletsController_getWallet"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wallet/entries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Extrato da wallet, paginado por cursor */
-        get: operations["WalletsController_getEntries"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/memberships": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Organizações e saldos do usuário autenticado — pra escolher qual carteira ver */
-        get: operations["MembershipsController_listMemberships"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wallet/transfer/recipients": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Busca membros ACTIVE da mesma organização por nome (parcial) pra escolher destinatário */
-        get: operations["TransferController_searchRecipients"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wallet/transfer": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Transfere coins pra outro membro da mesma organização — exige PIN de transação, limite de 1000 coins/dia por usuário */
-        post: operations["TransferController_create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/ranking": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Top 10 de coins ganhos por distribuição no mês (ou período informado) na organização */
-        get: operations["RankingController_getRanking"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/signup": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Inicia o claim de uma conta pendente (criada por distribuição) e envia o código por e-mail */
-        post: operations["SignupController_requestOtp"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/signup/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Confirma o código — cria/promove User+Membership+Wallet e retorna sessão */
-        post: operations["SignupController_verify"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login por CPF + senha — retorna a sessão direto, sem OTP */
-        post: operations["LoginController_login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/password/recovery": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Envia um código por e-mail pra redefinir a senha — serve tanto pra recuperar quanto pra definir a primeira senha */
-        post: operations["PasswordRecoveryController_requestRecovery"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/password/recovery/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Confirma o código, define a nova senha e retorna a sessão */
-        post: operations["PasswordRecoveryController_confirmRecovery"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/devices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Registra (ou atualiza) o device do usuário autenticado — upsert por fingerprint */
-        post: operations["DevicesController_register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me/notification-preferences": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Preferência de notificação do usuário autenticado */
-        get: operations["NotificationPreferencesController_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /** Atualiza a preferência de notificação do usuário autenticado */
-        patch: operations["NotificationPreferencesController_update"];
-        trace?: never;
-    };
-    "/users/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Rotaciona o refresh token do usuário (detecta reuso) */
-        post: operations["RefreshController_refresh"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Revoga o refresh token informado */
-        post: operations["RefreshController_logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Dados do usuário autenticado — nome, e-mail, CPF mascarado, preferência de notificação, se já tem PIN de transação */
-        get: operations["MeController_getMe"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/users/me/transaction-pin": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Define ou troca o PIN de transação (4-6 dígitos) — exigido em POST /redemptions */
-        post: operations["MeController_setTransactionPin"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/platform/batches": {
         parameters: {
             query?: never;
@@ -980,6 +1065,112 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/platform/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lista todos os cursos (qualquer status), paginado, com filtro opcional por status */
+        get: operations["PlatformCoursesController_list"];
+        put?: never;
+        /** Cria um curso (nasce em rascunho) */
+        post: operations["PlatformCoursesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/courses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detalhe do curso com aulas e quiz (incluindo qual alternativa é a correta) */
+        get: operations["PlatformCoursesController_getById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Atualiza título/descrição/capa/ordem/status — publicar é só status: PUBLISHED */
+        patch: operations["PlatformCoursesController_update"];
+        trace?: never;
+    };
+    "/platform/courses/{id}/lessons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adiciona uma aula ao curso */
+        post: operations["PlatformCoursesController_addLesson"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/courses/{id}/lessons/{lessonId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove uma aula do curso */
+        delete: operations["PlatformCoursesController_removeLesson"];
+        options?: never;
+        head?: never;
+        /** Atualiza uma aula */
+        patch: operations["PlatformCoursesController_updateLesson"];
+        trace?: never;
+    };
+    "/platform/courses/{id}/quiz/questions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adiciona uma questão ao quiz do curso (cria o quiz se ainda não existir) */
+        post: operations["PlatformCoursesController_addQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/courses/{id}/quiz/questions/{questionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove uma questão do quiz */
+        delete: operations["PlatformCoursesController_removeQuestion"];
+        options?: never;
+        head?: never;
+        /** Atualiza uma questão — substitui o conjunto de alternativas inteiro */
+        patch: operations["PlatformCoursesController_updateQuestion"];
         trace?: never;
     };
     "/organizations/me": {
@@ -1291,6 +1482,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/spins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Concede giros de roleta pra um CPF — reserva o pior caso (1.000 coins/giro) do estoque (OWNER/MANAGER) */
+        post: operations["SpinsAdminController_grant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/spins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Quantos giros de roleta o usuário tem disponíveis na organização informada */
+        get: operations["SpinsController_getAvailable"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/spins/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Gira a roleta — sorteia o setor no servidor, credita e devolve o resultado */
+        post: operations["SpinsController_redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1303,9 +1545,219 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
         };
-        LoginDto: {
+        ListCoursesResponseDto: {
+            items: {
+                id: string;
+                title: string;
+                description: string;
+                coverImageUrl: string | null;
+                displayOrder: number;
+                /** @enum {string} */
+                progress: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
+            }[];
+        };
+        CourseDetailResponseDto: {
+            id: string;
+            title: string;
+            description: string;
+            coverImageUrl: string | null;
+            lessons: {
+                id: string;
+                title: string;
+                videoUrl: string;
+                durationSeconds: number;
+                displayOrder: number;
+                completed: boolean;
+            }[];
+            quiz: {
+                /** @enum {string} */
+                state: "AVAILABLE" | "LOCKED" | "APPROVED";
+                /** Format: date-time */
+                lockedUntil: string | null;
+                /** Format: date-time */
+                approvedAt: string | null;
+                scorePercent: number | null;
+            } | null;
+        };
+        CompleteLessonDto: {
+            organizationId: string;
+        };
+        CompleteLessonResponseDto: {
+            completed: boolean;
+        };
+        QuizResponseDto: {
+            questions: {
+                id: string;
+                prompt: string;
+                displayOrder: number;
+                options: {
+                    id: string;
+                    text: string;
+                    displayOrder: number;
+                }[];
+            }[];
+        };
+        SubmitQuizDto: {
+            organizationId: string;
+            answers: {
+                questionId: string;
+                selectedOptionId: string;
+            }[];
+        };
+        SubmitQuizResponseDto: {
+            scorePercent: number;
+            passed: boolean;
+            /** Format: date-time */
+            retryAvailableAt: string | null;
+            courseCompletion: {
+                /** @enum {string} */
+                creditStatus: "PENDING" | "CREDITED";
+                coinsAwarded: number;
+            } | null;
+        };
+        WalletResponseDto: {
+            walletId: string;
+            cachedBalance: number;
+            totalEarned: number;
+            totalSpent: number;
+            expiring: {
+                batchId: string;
+                amount: number;
+                /** Format: date-time */
+                expiresAt: string;
+            }[];
+        };
+        LedgerEntryListResponseDto: {
+            items: {
+                id: string;
+                walletId: string;
+                /** @enum {string} */
+                type: "CREDIT" | "DEBIT" | "REVERSAL" | "EXPIRE";
+                amount: number;
+                balanceAfter: number;
+                /** @enum {string} */
+                referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER" | "SPIN" | "COURSE_COMPLETION";
+                referenceId: string;
+                batchId: string | null;
+                distributionItemId: string | null;
+                description: string;
+                reversalOfId: string | null;
+                /** Format: date-time */
+                createdAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        MembershipListResponseDto: {
+            organizationId: string;
+            organizationName: string;
+            /** @enum {string} */
+            membershipType: "CUSTOMER" | "EMPLOYEE";
+            /** @enum {string} */
+            membershipStatus: "ACTIVE" | "INACTIVE";
+            walletBalance: number;
+        }[];
+        RecipientListResponseDto: {
+            items: {
+                membershipId: string;
+                name: string;
+            }[];
+        };
+        CreateTransferDto: {
+            organizationId: string;
+            recipientMembershipId: string;
+            amount: number;
+            transactionPin: string;
+        };
+        TransferResponseDto: {
+            id: string;
+            amount: number;
+            recipientMembershipId: string;
+            recipientName: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        RankingResponseDto: {
+            items: {
+                position: number;
+                name: string;
+                coinsEarned: number;
+            }[];
+            currentUser: {
+                position: number;
+                coinsEarned: number;
+            };
+            period: string;
+        };
+        RequestSignupDto: {
             cpf: string;
+            name: string;
+            /** Format: email */
+            email: string;
+            phone?: string;
+        };
+        RequestOtpResponseDto: {
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        VerifySignupDto: {
+            cpf: string;
+            code: string;
             password: string;
+        };
+        UserTokenPairResponseDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** @enum {string} */
+            tokenType: "Bearer";
+            expiresIn: number;
+        };
+        LoginDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        RequestPasswordRecoveryDto: {
+            cpf: string;
+        };
+        ConfirmPasswordRecoveryDto: {
+            cpf: string;
+            code: string;
+            newPassword: string;
+        };
+        RegisterDeviceDto: {
+            fingerprint: string;
+            pushToken?: string;
+        };
+        DeviceResponseDto: {
+            id: string;
+            fingerprint: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        NotificationPreferencesResponseDto: {
+            notificationsEnabled: boolean;
+        };
+        UpdateNotificationPreferencesDto: {
+            notificationsEnabled: boolean;
+        };
+        RefreshTokenDto: {
+            refreshToken: string;
+        };
+        LogoutDto: {
+            refreshToken: string;
+        };
+        MeResponseDto: {
+            id: string;
+            name: string;
+            email: string | null;
+            cpfMasked: string;
+            notificationsEnabled: boolean;
+            hasTransactionPin: boolean;
+        };
+        SetTransactionPinDto: {
+            pin: string;
         };
         LoginResponseDto: {
             /** @enum {string} */
@@ -1343,9 +1795,6 @@ export interface components {
             code: string;
         };
         RefreshDto: {
-            refreshToken: string;
-        };
-        LogoutDto: {
             refreshToken: string;
         };
         AdminProfileDto: {
@@ -1843,142 +2292,6 @@ export interface components {
             offerTitle: string | null;
             customerFirstName: string;
         };
-        WalletResponseDto: {
-            walletId: string;
-            cachedBalance: number;
-            totalEarned: number;
-            totalSpent: number;
-            expiring: {
-                batchId: string;
-                amount: number;
-                /** Format: date-time */
-                expiresAt: string;
-            }[];
-        };
-        LedgerEntryListResponseDto: {
-            items: {
-                id: string;
-                walletId: string;
-                /** @enum {string} */
-                type: "CREDIT" | "DEBIT" | "REVERSAL" | "EXPIRE";
-                amount: number;
-                balanceAfter: number;
-                /** @enum {string} */
-                referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER";
-                referenceId: string;
-                batchId: string | null;
-                distributionItemId: string | null;
-                description: string;
-                reversalOfId: string | null;
-                /** Format: date-time */
-                createdAt: string;
-            }[];
-            nextCursor: string | null;
-        };
-        MembershipListResponseDto: {
-            organizationId: string;
-            organizationName: string;
-            /** @enum {string} */
-            membershipType: "CUSTOMER" | "EMPLOYEE";
-            /** @enum {string} */
-            membershipStatus: "ACTIVE" | "INACTIVE";
-            walletBalance: number;
-        }[];
-        RecipientListResponseDto: {
-            items: {
-                membershipId: string;
-                name: string;
-            }[];
-        };
-        CreateTransferDto: {
-            organizationId: string;
-            recipientMembershipId: string;
-            amount: number;
-            transactionPin: string;
-        };
-        TransferResponseDto: {
-            id: string;
-            amount: number;
-            recipientMembershipId: string;
-            recipientName: string;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        RankingResponseDto: {
-            items: {
-                position: number;
-                name: string;
-                coinsEarned: number;
-            }[];
-            currentUser: {
-                position: number;
-                coinsEarned: number;
-            };
-            period: string;
-        };
-        RequestSignupDto: {
-            cpf: string;
-            name: string;
-            /** Format: email */
-            email: string;
-            phone?: string;
-        };
-        RequestOtpResponseDto: {
-            /** Format: date-time */
-            expiresAt: string;
-        };
-        VerifySignupDto: {
-            cpf: string;
-            code: string;
-            password: string;
-        };
-        UserTokenPairResponseDto: {
-            accessToken: string;
-            refreshToken: string;
-            /** @enum {string} */
-            tokenType: "Bearer";
-            expiresIn: number;
-        };
-        RequestPasswordRecoveryDto: {
-            cpf: string;
-        };
-        ConfirmPasswordRecoveryDto: {
-            cpf: string;
-            code: string;
-            newPassword: string;
-        };
-        RegisterDeviceDto: {
-            fingerprint: string;
-            pushToken?: string;
-        };
-        DeviceResponseDto: {
-            id: string;
-            fingerprint: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        NotificationPreferencesResponseDto: {
-            notificationsEnabled: boolean;
-        };
-        UpdateNotificationPreferencesDto: {
-            notificationsEnabled: boolean;
-        };
-        RefreshTokenDto: {
-            refreshToken: string;
-        };
-        MeResponseDto: {
-            id: string;
-            name: string;
-            email: string | null;
-            cpfMasked: string;
-            notificationsEnabled: boolean;
-            hasTransactionPin: boolean;
-        };
-        SetTransactionPinDto: {
-            pin: string;
-        };
         PlatformBatchListResponseDto: {
             items: {
                 id: string;
@@ -2012,6 +2325,108 @@ export interface components {
         };
         RejectBatchDto: {
             reason?: string;
+        };
+        CreateCourseDto: {
+            title: string;
+            description: string;
+            /** Format: uri */
+            coverImageUrl?: string;
+            displayOrder: number;
+        };
+        CourseSummaryDto: {
+            id: string;
+            title: string;
+            description: string;
+            coverImageUrl: string | null;
+            displayOrder: number;
+            /** @enum {string} */
+            status: "DRAFT" | "PUBLISHED";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CourseListResponseDto: {
+            items: {
+                id: string;
+                title: string;
+                description: string;
+                coverImageUrl: string | null;
+                displayOrder: number;
+                /** @enum {string} */
+                status: "DRAFT" | "PUBLISHED";
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        CourseDetailAdminDto: {
+            id: string;
+            title: string;
+            description: string;
+            coverImageUrl: string | null;
+            displayOrder: number;
+            /** @enum {string} */
+            status: "DRAFT" | "PUBLISHED";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            lessons: {
+                id: string;
+                title: string;
+                videoUrl: string;
+                durationSeconds: number;
+                displayOrder: number;
+            }[];
+            quiz: {
+                id: string;
+                questions: {
+                    id: string;
+                    prompt: string;
+                    displayOrder: number;
+                    options: {
+                        id: string;
+                        text: string;
+                        isCorrect: boolean;
+                        displayOrder: number;
+                    }[];
+                }[];
+            } | null;
+        };
+        UpdateCourseDto: {
+            title?: string;
+            description?: string;
+            /** Format: uri */
+            coverImageUrl?: string | null;
+            displayOrder?: number;
+            /** @enum {string} */
+            status?: "DRAFT" | "PUBLISHED";
+        };
+        CreateLessonDto: {
+            title: string;
+            /** Format: uri */
+            videoUrl: string;
+            durationSeconds: number;
+            displayOrder: number;
+        };
+        UpdateLessonDto: {
+            title?: string;
+            /** Format: uri */
+            videoUrl?: string;
+            durationSeconds?: number;
+            displayOrder?: number;
+        };
+        QuizQuestionDto: {
+            prompt: string;
+            displayOrder: number;
+            options: {
+                text: string;
+                isCorrect: boolean;
+                displayOrder: number;
+            }[];
         };
         OrganizationResponseDto: {
             id: string;
@@ -2189,7 +2604,7 @@ export interface components {
                     amount: number;
                     balanceAfter: number;
                     /** @enum {string} */
-                    referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER";
+                    referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER" | "SPIN" | "COURSE_COMPLETION";
                     referenceId: string;
                     batchId: string | null;
                     distributionItemId: string | null;
@@ -2358,6 +2773,40 @@ export interface components {
                 category: string;
             };
         };
+        GrantSpinsDto: {
+            cpf: string;
+            name: string;
+            quantity: number;
+            /** @enum {string} */
+            membershipType: "CUSTOMER" | "EMPLOYEE";
+            externalRef?: string;
+            reason?: string;
+        };
+        GrantSpinsResponseDto: {
+            id: string;
+            organizationId: string;
+            membershipId: string;
+            quantity: number;
+            reason: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            spins: {
+                id: string;
+                /** Format: date-time */
+                expiresAt: string;
+            }[];
+        };
+        SpinsAvailableResponseDto: {
+            availableSpins: number;
+            sectors: number[];
+        };
+        RedeemSpinDto: {
+            organizationId: string;
+        };
+        RedeemSpinResponseDto: {
+            sectorIndex: number;
+            coinsAwarded: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -2384,6 +2833,520 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HealthResponseDto"];
                 };
+            };
+        };
+    };
+    CoursesController_list: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListCoursesResponseDto"];
+                };
+            };
+        };
+    };
+    CoursesController_getById: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailResponseDto"];
+                };
+            };
+        };
+    };
+    CoursesController_completeLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                lessonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteLessonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompleteLessonResponseDto"];
+                };
+            };
+        };
+    };
+    CoursesController_getQuiz: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizResponseDto"];
+                };
+            };
+        };
+    };
+    CoursesController_submitQuiz: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitQuizDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SubmitQuizResponseDto"];
+                };
+            };
+        };
+    };
+    WalletsController_getWallet: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalletResponseDto"];
+                };
+            };
+        };
+    };
+    WalletsController_getEntries: {
+        parameters: {
+            query: {
+                organizationId: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LedgerEntryListResponseDto"];
+                };
+            };
+        };
+    };
+    MembershipsController_listMemberships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MembershipListResponseDto"];
+                };
+            };
+        };
+    };
+    TransferController_searchRecipients: {
+        parameters: {
+            query: {
+                organizationId: string;
+                query: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecipientListResponseDto"];
+                };
+            };
+        };
+    };
+    TransferController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTransferDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TransferResponseDto"];
+                };
+            };
+        };
+    };
+    RankingController_getRanking: {
+        parameters: {
+            query: {
+                organizationId: string;
+                period?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankingResponseDto"];
+                };
+            };
+        };
+    };
+    SignupController_requestOtp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestSignupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestOtpResponseDto"];
+                };
+            };
+        };
+    };
+    SignupController_verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifySignupDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
+                };
+            };
+        };
+    };
+    LoginController_login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
+                };
+            };
+        };
+    };
+    PasswordRecoveryController_requestRecovery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequestPasswordRecoveryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RequestOtpResponseDto"];
+                };
+            };
+        };
+    };
+    PasswordRecoveryController_confirmRecovery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmPasswordRecoveryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
+                };
+            };
+        };
+    };
+    DevicesController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterDeviceDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceResponseDto"];
+                };
+            };
+        };
+    };
+    NotificationPreferencesController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreferencesResponseDto"];
+                };
+            };
+        };
+    };
+    NotificationPreferencesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateNotificationPreferencesDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPreferencesResponseDto"];
+                };
+            };
+        };
+    };
+    RefreshController_refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshTokenDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
+                };
+            };
+        };
+    };
+    RefreshController_logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogoutDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeController_getMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponseDto"];
+                };
+            };
+        };
+    };
+    MeController_setTransactionPin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetTransactionPinDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3359,402 +4322,6 @@ export interface operations {
             };
         };
     };
-    WalletsController_getWallet: {
-        parameters: {
-            query: {
-                organizationId: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WalletResponseDto"];
-                };
-            };
-        };
-    };
-    WalletsController_getEntries: {
-        parameters: {
-            query: {
-                organizationId: string;
-                cursor?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LedgerEntryListResponseDto"];
-                };
-            };
-        };
-    };
-    MembershipsController_listMemberships: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MembershipListResponseDto"];
-                };
-            };
-        };
-    };
-    TransferController_searchRecipients: {
-        parameters: {
-            query: {
-                organizationId: string;
-                query: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecipientListResponseDto"];
-                };
-            };
-        };
-    };
-    TransferController_create: {
-        parameters: {
-            query?: never;
-            header: {
-                "Idempotency-Key": string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateTransferDto"];
-            };
-        };
-        responses: {
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TransferResponseDto"];
-                };
-            };
-        };
-    };
-    RankingController_getRanking: {
-        parameters: {
-            query: {
-                organizationId: string;
-                period?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RankingResponseDto"];
-                };
-            };
-        };
-    };
-    SignupController_requestOtp: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RequestSignupDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RequestOtpResponseDto"];
-                };
-            };
-        };
-    };
-    SignupController_verify: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VerifySignupDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
-                };
-            };
-        };
-    };
-    LoginController_login: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
-                };
-            };
-        };
-    };
-    PasswordRecoveryController_requestRecovery: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RequestPasswordRecoveryDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RequestOtpResponseDto"];
-                };
-            };
-        };
-    };
-    PasswordRecoveryController_confirmRecovery: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConfirmPasswordRecoveryDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
-                };
-            };
-        };
-    };
-    DevicesController_register: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterDeviceDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DeviceResponseDto"];
-                };
-            };
-        };
-    };
-    NotificationPreferencesController_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationPreferencesResponseDto"];
-                };
-            };
-        };
-    };
-    NotificationPreferencesController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateNotificationPreferencesDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NotificationPreferencesResponseDto"];
-                };
-            };
-        };
-    };
-    RefreshController_refresh: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshTokenDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserTokenPairResponseDto"];
-                };
-            };
-        };
-    };
-    RefreshController_logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LogoutDto"];
-            };
-        };
-        responses: {
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    MeController_getMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MeResponseDto"];
-                };
-            };
-        };
-    };
-    MeController_setTransactionPin: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetTransactionPinDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
     PlatformBatchesController_list: {
         parameters: {
             query?: {
@@ -3821,6 +4388,232 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["PlatformBatchItemDto"];
                 };
+            };
+        };
+    };
+    PlatformCoursesController_list: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+                status?: "DRAFT" | "PUBLISHED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseListResponseDto"];
+                };
+            };
+        };
+    };
+    PlatformCoursesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCourseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSummaryDto"];
+                };
+            };
+        };
+    };
+    PlatformCoursesController_getById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetailAdminDto"];
+                };
+            };
+        };
+    };
+    PlatformCoursesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCourseDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSummaryDto"];
+                };
+            };
+        };
+    };
+    PlatformCoursesController_addLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLessonDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformCoursesController_removeLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                lessonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformCoursesController_updateLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                lessonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLessonDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformCoursesController_addQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizQuestionDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformCoursesController_removeQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformCoursesController_updateQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                questionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizQuestionDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -4298,6 +5091,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OfferCatalogResponseDto"];
+                };
+            };
+        };
+    };
+    SpinsAdminController_grant: {
+        parameters: {
+            query?: never;
+            header: {
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantSpinsDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrantSpinsResponseDto"];
+                };
+            };
+        };
+    };
+    SpinsController_getAvailable: {
+        parameters: {
+            query: {
+                organizationId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SpinsAvailableResponseDto"];
+                };
+            };
+        };
+    };
+    SpinsController_redeem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedeemSpinDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedeemSpinResponseDto"];
                 };
             };
         };

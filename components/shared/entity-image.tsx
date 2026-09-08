@@ -3,13 +3,13 @@
 import * as React from "react"
 import { ImageOff } from "lucide-react"
 
-type OfferImageProps = {
+type EntityImageProps = {
   src?: string | null
   alt: string
   size?: "thumb" | "large"
 }
 
-export function OfferImage({ src, alt, size = "thumb" }: OfferImageProps) {
+export function EntityImage({ src, alt, size = "thumb" }: EntityImageProps) {
   const [errored, setErrored] = React.useState(false)
 
   React.useEffect(() => {

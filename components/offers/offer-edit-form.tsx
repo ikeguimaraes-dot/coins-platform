@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { OfferImage } from "@/components/offers/offer-image"
+import { EntityImage } from "@/components/shared/entity-image"
 import { ApiError } from "@/lib/api/client"
 import { updateOffer, type OfferSummary, type UpdateOfferInput } from "@/lib/api/offers"
 import { OFFER_STATUS_OPTIONS, type OfferStatus } from "@/lib/offers/status"
@@ -127,7 +127,7 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
           </div>
           {imageUrl.trim() ? (
             <div className="mt-2 max-w-xs">
-              <OfferImage src={imageUrl} alt="Preview da oferta" size="large" />
+              <EntityImage src={imageUrl} alt="Preview da oferta" size="large" />
             </div>
           ) : null}
         </div>

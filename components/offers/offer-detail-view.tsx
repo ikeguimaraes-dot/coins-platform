@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { DashboardError } from "@/components/dashboard/dashboard-error"
 import { OfferDetailSkeleton } from "@/components/offers/offer-detail-skeleton"
 import { OfferEditForm } from "@/components/offers/offer-edit-form"
-import { OfferImage } from "@/components/offers/offer-image"
+import { EntityImage } from "@/components/shared/entity-image"
 import { OfferStatusBadge } from "@/components/offers/offer-status-badge"
 import { ApiError } from "@/lib/api/client"
 import { getOffer } from "@/lib/api/offers"
@@ -53,7 +53,7 @@ export function OfferDetailView({ id }: { id: string }) {
         <DashboardError onRetry={() => refetch()} />
       ) : (
         <>
-          <OfferImage src={offer.imageUrl} alt={offer.title} size="large" />
+          <EntityImage src={offer.imageUrl} alt={offer.title} size="large" />
 
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
