@@ -1564,6 +1564,7 @@ export interface components {
             lessons: {
                 id: string;
                 title: string;
+                thumbnailUrl: string | null;
                 videoUrl: string;
                 durationSeconds: number;
                 displayOrder: number;
@@ -1571,7 +1572,8 @@ export interface components {
             }[];
             quiz: {
                 /** @enum {string} */
-                state: "AVAILABLE" | "LOCKED" | "APPROVED";
+                state: "LESSONS_PENDING" | "AVAILABLE" | "LOCKED" | "APPROVED";
+                pendingLessons: number | null;
                 /** Format: date-time */
                 lockedUntil: string | null;
                 /** Format: date-time */
@@ -1711,9 +1713,8 @@ export interface components {
             tokenType: "Bearer";
             expiresIn: number;
         };
-        LoginDto: {
-            /** Format: email */
-            email: string;
+        UserLoginDto: {
+            cpf: string;
             password: string;
         };
         RequestPasswordRecoveryDto: {
@@ -1745,7 +1746,7 @@ export interface components {
         RefreshTokenDto: {
             refreshToken: string;
         };
-        LogoutDto: {
+        UserLogoutDto: {
             refreshToken: string;
         };
         MeResponseDto: {
@@ -1759,7 +1760,12 @@ export interface components {
         SetTransactionPinDto: {
             pin: string;
         };
-        LoginResponseDto: {
+        AdminLoginDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
+        AdminLoginResponseDto: {
             /** @enum {string} */
             status: "MFA_REQUIRED";
             mfaChallengeToken: string;
@@ -1776,25 +1782,28 @@ export interface components {
             tokenType: "Bearer";
             expiresIn: number;
         };
-        MfaSetupResponseDto: {
+        AdminMfaSetupResponseDto: {
             secret: string;
             otpauthUrl: string;
             qrCodeDataUrl: string;
         };
-        EnableMfaDto: {
+        AdminEnableMfaDto: {
             code: string;
         };
-        TokenPairDto: {
+        AdminTokenPairDto: {
             accessToken: string;
             refreshToken: string;
             /** @enum {string} */
             tokenType: "Bearer";
             expiresIn: number;
         };
-        VerifyMfaDto: {
+        AdminVerifyMfaDto: {
             code: string;
         };
-        RefreshDto: {
+        AdminRefreshDto: {
+            refreshToken: string;
+        };
+        AdminLogoutDto: {
             refreshToken: string;
         };
         AdminProfileDto: {
@@ -1823,6 +1832,11 @@ export interface components {
             }[];
             nextCursor: string | null;
         };
+        PlatformAdminLoginDto: {
+            /** Format: email */
+            email: string;
+            password: string;
+        };
         PlatformAdminLoginResponseDto: {
             /** @enum {string} */
             status: "MFA_REQUIRED";
@@ -1831,6 +1845,30 @@ export interface components {
             /** @enum {string} */
             status: "MFA_SETUP_REQUIRED";
             mfaChallengeToken: string;
+        };
+        PlatformAdminMfaSetupResponseDto: {
+            secret: string;
+            otpauthUrl: string;
+            qrCodeDataUrl: string;
+        };
+        PlatformAdminEnableMfaDto: {
+            code: string;
+        };
+        PlatformAdminTokenPairDto: {
+            accessToken: string;
+            refreshToken: string;
+            /** @enum {string} */
+            tokenType: "Bearer";
+            expiresIn: number;
+        };
+        PlatformAdminVerifyMfaDto: {
+            code: string;
+        };
+        PlatformAdminRefreshDto: {
+            refreshToken: string;
+        };
+        PlatformAdminLogoutDto: {
+            refreshToken: string;
         };
         PlatformAdminProfileDto: {
             id: string;
@@ -2377,6 +2415,7 @@ export interface components {
             lessons: {
                 id: string;
                 title: string;
+                thumbnailUrl: string | null;
                 videoUrl: string;
                 durationSeconds: number;
                 displayOrder: number;
@@ -2408,12 +2447,16 @@ export interface components {
         CreateLessonDto: {
             title: string;
             /** Format: uri */
+            thumbnailUrl?: string;
+            /** Format: uri */
             videoUrl: string;
             durationSeconds: number;
             displayOrder: number;
         };
         UpdateLessonDto: {
             title?: string;
+            /** Format: uri */
+            thumbnailUrl?: string | null;
             /** Format: uri */
             videoUrl?: string;
             durationSeconds?: number;
@@ -3141,7 +3184,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginDto"];
+                "application/json": components["schemas"]["UserLoginDto"];
             };
         };
         responses: {
@@ -3298,7 +3341,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LogoutDto"];
+                "application/json": components["schemas"]["UserLogoutDto"];
             };
         };
         responses: {
@@ -3359,7 +3402,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginDto"];
+                "application/json": components["schemas"]["AdminLoginDto"];
             };
         };
         responses: {
@@ -3368,7 +3411,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LoginResponseDto"];
+                    "application/json": components["schemas"]["AdminLoginResponseDto"];
                 };
             };
         };
@@ -3387,7 +3430,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MfaSetupResponseDto"];
+                    "application/json": components["schemas"]["AdminMfaSetupResponseDto"];
                 };
             };
         };
@@ -3401,7 +3444,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EnableMfaDto"];
+                "application/json": components["schemas"]["AdminEnableMfaDto"];
             };
         };
         responses: {
@@ -3410,7 +3453,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["AdminTokenPairDto"];
                 };
             };
         };
@@ -3424,7 +3467,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VerifyMfaDto"];
+                "application/json": components["schemas"]["AdminVerifyMfaDto"];
             };
         };
         responses: {
@@ -3433,7 +3476,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["AdminTokenPairDto"];
                 };
             };
         };
@@ -3447,7 +3490,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RefreshDto"];
+                "application/json": components["schemas"]["AdminRefreshDto"];
             };
         };
         responses: {
@@ -3456,7 +3499,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["AdminTokenPairDto"];
                 };
             };
         };
@@ -3470,7 +3513,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LogoutDto"];
+                "application/json": components["schemas"]["AdminLogoutDto"];
             };
         };
         responses: {
@@ -3532,7 +3575,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginDto"];
+                "application/json": components["schemas"]["PlatformAdminLoginDto"];
             };
         };
         responses: {
@@ -3560,7 +3603,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MfaSetupResponseDto"];
+                    "application/json": components["schemas"]["PlatformAdminMfaSetupResponseDto"];
                 };
             };
         };
@@ -3574,7 +3617,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["EnableMfaDto"];
+                "application/json": components["schemas"]["PlatformAdminEnableMfaDto"];
             };
         };
         responses: {
@@ -3583,7 +3626,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["PlatformAdminTokenPairDto"];
                 };
             };
         };
@@ -3597,7 +3640,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VerifyMfaDto"];
+                "application/json": components["schemas"]["PlatformAdminVerifyMfaDto"];
             };
         };
         responses: {
@@ -3606,7 +3649,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["PlatformAdminTokenPairDto"];
                 };
             };
         };
@@ -3620,7 +3663,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RefreshDto"];
+                "application/json": components["schemas"]["PlatformAdminRefreshDto"];
             };
         };
         responses: {
@@ -3629,7 +3672,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPairDto"];
+                    "application/json": components["schemas"]["PlatformAdminTokenPairDto"];
                 };
             };
         };
@@ -3643,7 +3686,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LogoutDto"];
+                "application/json": components["schemas"]["PlatformAdminLogoutDto"];
             };
         };
         responses: {

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { EntityImage } from "@/components/shared/entity-image"
 import { ApiError } from "@/lib/api/client"
 import { addLesson, updateLesson, type Lesson } from "@/lib/api/courses"
 import { minutesAndSecondsToSeconds, secondsToMinutesAndSeconds } from "@/lib/courses/duration"
@@ -24,6 +25,7 @@ import { minutesAndSecondsToSeconds, secondsToMinutesAndSeconds } from "@/lib/co
 const schema = z.object({
   title: z.string().min(1, "Informe o título"),
   videoUrl: z.string().min(1, "Informe a URL do vídeo"),
+  thumbnailUrl: z.string().optional(),
   minutes: z
     .string()
     .min(1, "Informe os minutos")
@@ -60,8 +62,10 @@ export function LessonFormDialog({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { title: "", videoUrl: "", minutes: "0", seconds: "0", displayOrder: "0" },
+    defaultValues: { title: "", videoUrl: "", thumbnailUrl: "", minutes: "0", seconds: "0", displayOrder: "0" },
   })
+
+  const thumbnailUrl = form.watch("thumbnailUrl")
 
   React.useEffect(() => {
     if (!open) return
@@ -70,12 +74,13 @@ export function LessonFormDialog({
       form.reset({
         title: lesson.title,
         videoUrl: lesson.videoUrl,
+        thumbnailUrl: lesson.thumbnailUrl ?? "",
         minutes: String(minutes),
         seconds: String(seconds),
         displayOrder: String(lesson.displayOrder),
       })
     } else {
-      form.reset({ title: "", videoUrl: "", minutes: "0", seconds: "0", displayOrder: "0" })
+      form.reset({ title: "", videoUrl: "", thumbnailUrl: "", minutes: "0", seconds: "0", displayOrder: "0" })
     }
     setFormError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,13 +88,26 @@ export function LessonFormDialog({
 
   const mutation = useMutation({
     mutationFn: (values: FormValues) => {
-      const input = {
+      const trimmedThumbnailUrl = values.thumbnailUrl?.trim() ?? ""
+      const durationSeconds = minutesAndSecondsToSeconds(Number(values.minutes), Number(values.seconds))
+
+      if (isEditing) {
+        return updateLesson(courseId, lesson.id, {
+          title: values.title,
+          videoUrl: values.videoUrl,
+          thumbnailUrl: trimmedThumbnailUrl ? trimmedThumbnailUrl : null,
+          durationSeconds,
+          displayOrder: Number(values.displayOrder),
+        })
+      }
+
+      return addLesson(courseId, {
         title: values.title,
         videoUrl: values.videoUrl,
-        durationSeconds: minutesAndSecondsToSeconds(Number(values.minutes), Number(values.seconds)),
+        ...(trimmedThumbnailUrl ? { thumbnailUrl: trimmedThumbnailUrl } : {}),
+        durationSeconds,
         displayOrder: Number(values.displayOrder),
-      }
-      return isEditing ? updateLesson(courseId, lesson.id, input) : addLesson(courseId, input)
+      })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["course", courseId] })
@@ -107,7 +125,7 @@ export function LessonFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Editar aula" : "Adicionar aula"}</DialogTitle>
           <DialogDescription>Vídeo não listado do YouTube ou qualquer outra URL de vídeo.</DialogDescription>
@@ -140,6 +158,31 @@ export function LessonFormDialog({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="thumbnailUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Miniatura (URL, opcional)</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-2">
+                      <Input {...field} placeholder="https://..." autoComplete="off" />
+                      {field.value ? (
+                        <Button type="button" variant="outline" onClick={() => field.onChange("")}>
+                          Remover
+                        </Button>
+                      ) : null}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {thumbnailUrl?.trim() ? (
+              <div className="max-w-xs">
+                <EntityImage src={thumbnailUrl} alt="Preview da miniatura" size="large" />
+              </div>
+            ) : null}
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
