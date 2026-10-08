@@ -11,6 +11,7 @@ import { OfferRow } from "@/components/offers/offer-row"
 import { OffersSkeleton } from "@/components/offers/offers-skeleton"
 import { DashboardError } from "@/components/dashboard/dashboard-error"
 import { listOffers } from "@/lib/api/offers"
+import { listOfferCategories } from "@/lib/api/offer-categories"
 import { listAllPartners } from "@/lib/api/partners"
 
 const PAGE_SIZE = 20
@@ -24,6 +25,14 @@ export function OffersView() {
     queryFn: listAllPartners,
   })
   const partners = partnersQuery.data ?? []
+  const categoriesQuery = useQuery({
+    queryKey: ["offer-categories", true],
+    queryFn: () => listOfferCategories({ includeInactive: true }),
+  })
+  const categoryNames = React.useMemo(
+    () => new Map((categoriesQuery.data?.items ?? []).map((category) => [category.slug, category.name])),
+    [categoriesQuery.data]
+  )
 
   const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["offers", partnerFilter],
@@ -113,7 +122,7 @@ export function OffersView() {
         <>
           <div className="rounded-2xl border bg-background px-4">
             {items.map((offer) => (
-              <OfferRow key={offer.id} offer={offer} />
+              <OfferRow key={offer.id} offer={offer} categoryName={categoryNames.get(offer.category)} />
             ))}
           </div>
           {hasNextPage ? (

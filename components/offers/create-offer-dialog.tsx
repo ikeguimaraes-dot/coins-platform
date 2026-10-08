@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ImageUploadField } from "@/components/shared/image-upload-field"
+import { OfferCategorySelect } from "@/components/offers/offer-category-select"
 import { ApiError } from "@/lib/api/client"
 import { createOffer } from "@/lib/api/offers"
 import type { PartnerListItem } from "@/lib/api/partners"
@@ -37,7 +38,19 @@ const schema = z.object({
       "Custo deve ser um número inteiro positivo"
     ),
   partnerId: z.string().min(1, "Selecione um parceiro"),
+  originalCost: z.string().optional(),
+  featured: z.boolean(),
+  validUntil: z.string().optional(),
   imageUrl: z.string().optional(),
+}).superRefine((values, context) => {
+  if (!values.originalCost) return
+  const originalCost = Number(values.originalCost)
+  const cost = Number(values.costInCoins)
+  if (!Number.isInteger(originalCost) || originalCost <= 0) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["originalCost"], message: "Informe um número inteiro positivo" })
+  } else if (Number.isFinite(cost) && originalCost <= cost) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ["originalCost"], message: "O custo original deve ser maior que o custo atual" })
+  }
 })
 
 type FormValues = z.infer<typeof schema>
@@ -54,10 +67,21 @@ export function CreateOfferDialog({
   const queryClient = useQueryClient()
   const [formError, setFormError] = React.useState<string | null>(null)
   const [imageUploading, setImageUploading] = React.useState(false)
+  const [categoriesReady, setCategoriesReady] = React.useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { title: "", description: "", category: "", costInCoins: "", partnerId: "", imageUrl: "" },
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      costInCoins: "",
+      originalCost: "",
+      featured: false,
+      validUntil: "",
+      partnerId: "",
+      imageUrl: "",
+    },
   })
 
   function handleOpenChange(next: boolean) {
@@ -89,6 +113,9 @@ export function CreateOfferDialog({
       description: values.description,
       category: values.category,
       costInCoins: Number(values.costInCoins),
+      originalCost: values.originalCost ? Number(values.originalCost) : undefined,
+      featured: values.featured,
+      validUntil: values.validUntil ? new Date(values.validUntil).toISOString() : undefined,
       partnerId: values.partnerId,
       imageUrl: values.imageUrl?.trim() ? values.imageUrl.trim() : undefined,
     })
@@ -136,9 +163,7 @@ export function CreateOfferDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Categoria</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Combustível" autoComplete="off" />
-                    </FormControl>
+                    <OfferCategorySelect value={field.value} onChange={field.onChange} onReadyChange={setCategoriesReady} />
                     <FormMessage />
                   </FormItem>
                 )}
@@ -157,6 +182,52 @@ export function CreateOfferDialog({
                 )}
               />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="originalCost"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Custo original (opcional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} inputMode="numeric" placeholder="2500" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="validUntil"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Validade (opcional)</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="datetime-local" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="featured"
+              render={({ field }) => (
+                <FormItem>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(event) => field.onChange(event.target.checked)}
+                      className="h-4 w-4 rounded border-input accent-[#C63C0B]"
+                    />
+                    Marcar como destaque
+                  </label>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="partnerId"
@@ -197,7 +268,7 @@ export function CreateOfferDialog({
             <DialogFooter>
               <Button
                 type="submit"
-                disabled={mutation.isPending || imageUploading}
+                disabled={mutation.isPending || imageUploading || !categoriesReady}
                 className="bg-[#C63C0B] hover:bg-[#B23509]"
               >
                 {imageUploading ? "Enviando imagem..." : mutation.isPending ? "Criando..." : "Criar oferta"}

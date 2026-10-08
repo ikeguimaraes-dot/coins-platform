@@ -7,7 +7,7 @@ import { formatInt } from "@/lib/dashboard/format"
 import { BRAND_ACTION } from "@/lib/dashboard/theme"
 import type { OfferListItem } from "@/lib/api/offers"
 
-export function OfferRow({ offer }: { offer: OfferListItem }) {
+export function OfferRow({ offer, categoryName }: { offer: OfferListItem; categoryName?: string }) {
   return (
     <Link
       href={`/ofertas/${offer.id}`}
@@ -18,10 +18,22 @@ export function OfferRow({ offer }: { offer: OfferListItem }) {
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate text-[14px] font-semibold">{offer.title}</span>
           <OfferStatusBadge status={offer.status} />
+          {offer.featured ? (
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+              Destaque
+            </span>
+          ) : null}
         </div>
-        <div className="mt-0.5 truncate text-[12.5px] text-muted-foreground">{offer.partner.name}</div>
+        <div className="mt-0.5 truncate text-[12.5px] text-muted-foreground">
+          {offer.partner.name} · {categoryName ?? offer.category}
+        </div>
       </div>
       <div className="hidden shrink-0 text-right sm:block">
+        {offer.originalCost ? (
+          <div className="text-[11.5px] tabular-nums text-muted-foreground line-through">
+            {formatInt(offer.originalCost)} coins
+          </div>
+        ) : null}
         <div className="text-[13.5px] font-bold tabular-nums" style={{ color: BRAND_ACTION }}>
           {formatInt(offer.costInCoins)} coins
         </div>
