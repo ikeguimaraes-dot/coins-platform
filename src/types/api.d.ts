@@ -130,7 +130,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Extrato da wallet, paginado por cursor */
+        /** Extrato da wallet, paginado por cursor — entradas de reconhecimento trazem quem reconheceu, mensagem e valor */
         get: operations["WalletsController_getEntries"];
         put?: never;
         post?: never;
@@ -930,6 +930,39 @@ export interface paths {
         patch: operations["PlatformOffersController_update"];
         trace?: never;
     };
+    "/platform/offer-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PlatformOfferCategoriesController_list"];
+        put?: never;
+        /** Cria uma categoria administrável de ofertas */
+        post: operations["PlatformOfferCategoriesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/offer-categories/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["PlatformOfferCategoriesController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["PlatformOfferCategoriesController_update"];
+        trace?: never;
+    };
     "/platform/dashboard": {
         parameters: {
             query?: never;
@@ -1455,7 +1488,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Catálogo de ofertas disponíveis — filtro opcional por parceiro (?partnerId=) */
+        /** Catálogo disponível — filtros opcionais por parceiro, categoria e destaque */
         get: operations["OffersController_list"];
         put?: never;
         post?: never;
@@ -1531,6 +1564,42 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/admin/organization-values": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Valores da organização, em ordem — só ativos, salvo includeInactive=true */
+        get: operations["OrganizationValuesController_list"];
+        put?: never;
+        /** Cria um valor (OWNER/MANAGER) — sem sortOrder, entra no fim da lista */
+        post: operations["OrganizationValuesController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/organization-values/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Apaga um valor nunca usado (OWNER/MANAGER) — usado em reconhecimento: 409, desative */
+        delete: operations["OrganizationValuesController_remove"];
+        options?: never;
+        head?: never;
+        /** Renomeia, reordena, ativa ou desativa um valor (OWNER/MANAGER) */
+        patch: operations["OrganizationValuesController_update"];
         trace?: never;
     };
 }
@@ -1629,7 +1698,7 @@ export interface components {
                 expiresAt: string;
             }[];
         };
-        LedgerEntryListResponseDto: {
+        WalletEntryListResponseDto: {
             items: {
                 id: string;
                 walletId: string;
@@ -1646,6 +1715,14 @@ export interface components {
                 reversalOfId: string | null;
                 /** Format: date-time */
                 createdAt: string;
+                recognition: {
+                    message: string | null;
+                    recognizedByName: string;
+                    value: {
+                        id: string;
+                        name: string;
+                    } | null;
+                } | null;
             }[];
             nextCursor: string | null;
         };
@@ -2140,12 +2217,14 @@ export interface components {
             description: string;
             category: string;
             costInCoins: number;
+            originalCost?: number | null;
+            featured?: boolean;
             /** Format: uri */
             imageUrl?: string;
             /** Format: date-time */
             validFrom?: string;
             /** Format: date-time */
-            validUntil?: string;
+            validUntil?: string | null;
             perUserLimit?: number;
         };
         OfferSummaryDto: {
@@ -2155,6 +2234,8 @@ export interface components {
             description: string;
             category: string;
             costInCoins: number;
+            originalCost: number | null;
+            featured: boolean;
             imageUrl: string | null;
             /** Format: date-time */
             validFrom: string | null;
@@ -2180,6 +2261,8 @@ export interface components {
                 description: string;
                 category: string;
                 costInCoins: number;
+                originalCost: number | null;
+                featured: boolean;
                 imageUrl: string | null;
                 /** Format: date-time */
                 validFrom: string | null;
@@ -2202,11 +2285,47 @@ export interface components {
         UpdatePlatformOfferDto: {
             title?: string;
             description?: string;
+            category?: string;
             costInCoins?: number;
+            originalCost?: number | null;
+            featured?: boolean;
             /** Format: uri */
             imageUrl?: string | null;
+            /** Format: date-time */
+            validUntil?: string | null;
             /** @enum {string} */
             status?: "ACTIVE" | "INACTIVE";
+        };
+        OfferCategoryListResponseDto: {
+            items: {
+                id: string;
+                name: string;
+                slug: string;
+                active: boolean;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+            }[];
+        };
+        CreateOfferCategoryDto: {
+            name: string;
+            slug: string;
+        };
+        OfferCategoryResponseDto: {
+            id: string;
+            name: string;
+            slug: string;
+            active: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateOfferCategoryDto: {
+            name?: string;
+            slug?: string;
+            active?: boolean;
         };
         PlatformDashboardResponseDto: {
             cards: {
@@ -2606,6 +2725,8 @@ export interface components {
             /** @enum {string} */
             membershipType: "CUSTOMER" | "EMPLOYEE";
             externalRef?: string;
+            message?: string;
+            organizationValueId?: string;
             reason?: string;
         };
         DistributeIndividualResponseDto: {
@@ -2615,6 +2736,8 @@ export interface components {
                 adminUserId: string;
                 csvFileUrl: string | null;
                 reason: string | null;
+                message: string | null;
+                organizationValueId: string | null;
                 totalItems: number;
                 successItems: number;
                 failedItems: number;
@@ -2661,6 +2784,8 @@ export interface components {
         UploadDistributionCsvDto: {
             /** @enum {string} */
             membershipType: "CUSTOMER" | "EMPLOYEE";
+            message?: string;
+            organizationValueId?: string;
         };
         DistributionWithItemsResponseDto: {
             distribution: {
@@ -2669,6 +2794,8 @@ export interface components {
                 adminUserId: string;
                 csvFileUrl: string | null;
                 reason: string | null;
+                message: string | null;
+                organizationValueId: string | null;
                 totalItems: number;
                 successItems: number;
                 failedItems: number;
@@ -2704,6 +2831,8 @@ export interface components {
             adminUserId: string;
             csvFileUrl: string | null;
             reason: string | null;
+            message: string | null;
+            organizationValueId: string | null;
             totalItems: number;
             successItems: number;
             failedItems: number;
@@ -2721,6 +2850,8 @@ export interface components {
                 adminUserId: string;
                 csvFileUrl: string | null;
                 reason: string | null;
+                message: string | null;
+                organizationValueId: string | null;
                 totalItems: number;
                 successItems: number;
                 failedItems: number;
@@ -2777,6 +2908,26 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        LedgerEntryListResponseDto: {
+            items: {
+                id: string;
+                walletId: string;
+                /** @enum {string} */
+                type: "CREDIT" | "DEBIT" | "REVERSAL" | "EXPIRE";
+                amount: number;
+                balanceAfter: number;
+                /** @enum {string} */
+                referenceType: "DISTRIBUTION" | "REDEMPTION" | "EXPIRATION" | "CAMPAIGN" | "MANUAL_ADJUSTMENT" | "REVERSAL" | "TRANSFER" | "SPIN" | "COURSE_COMPLETION";
+                referenceId: string;
+                batchId: string | null;
+                distributionItemId: string | null;
+                description: string;
+                reversalOfId: string | null;
+                /** Format: date-time */
+                createdAt: string;
+            }[];
+            nextCursor: string | null;
+        };
         ListOffersCatalogResponseDto: {
             items: {
                 id: string;
@@ -2784,6 +2935,8 @@ export interface components {
                 description: string;
                 category: string;
                 costInCoins: number;
+                originalCost: number | null;
+                featured: boolean;
                 imageUrl: string | null;
                 /** Format: date-time */
                 validFrom: string | null;
@@ -2804,6 +2957,8 @@ export interface components {
             description: string;
             category: string;
             costInCoins: number;
+            originalCost: number | null;
+            featured: boolean;
             imageUrl: string | null;
             /** Format: date-time */
             validFrom: string | null;
@@ -2849,6 +3004,43 @@ export interface components {
         RedeemSpinResponseDto: {
             sectorIndex: number;
             coinsAwarded: number;
+        };
+        OrganizationValueListResponseDto: {
+            items: {
+                id: string;
+                organizationId: string;
+                name: string;
+                description: string | null;
+                sortOrder: number;
+                isActive: boolean;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+            }[];
+        };
+        CreateOrganizationValueDto: {
+            name: string;
+            description?: string;
+            sortOrder?: number;
+        };
+        OrganizationValueResponseDto: {
+            id: string;
+            organizationId: string;
+            name: string;
+            description: string | null;
+            sortOrder: number;
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UpdateOrganizationValueDto: {
+            name?: string;
+            description?: string | null;
+            sortOrder?: number;
+            isActive?: boolean;
         };
     };
     responses: never;
@@ -3036,7 +3228,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LedgerEntryListResponseDto"];
+                    "application/json": components["schemas"]["WalletEntryListResponseDto"];
                 };
             };
         };
@@ -4231,6 +4423,94 @@ export interface operations {
             };
         };
     };
+    PlatformOfferCategoriesController_list: {
+        parameters: {
+            query?: {
+                includeInactive?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCategoryListResponseDto"];
+                };
+            };
+        };
+    };
+    PlatformOfferCategoriesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOfferCategoryDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCategoryResponseDto"];
+                };
+            };
+        };
+    };
+    PlatformOfferCategoriesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PlatformOfferCategoriesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOfferCategoryDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCategoryResponseDto"];
+                };
+            };
+        };
+    };
     PlatformDashboardController_getDashboard: {
         parameters: {
             query?: never;
@@ -5100,6 +5380,8 @@ export interface operations {
                 cursor?: string;
                 limit?: number;
                 partnerId?: string;
+                category?: string;
+                featured?: "true" | "false";
             };
             header?: never;
             path?: never;
@@ -5203,6 +5485,94 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RedeemSpinResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationValuesController_list: {
+        parameters: {
+            query?: {
+                includeInactive?: "true" | "false";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationValueListResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationValuesController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateOrganizationValueDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationValueResponseDto"];
+                };
+            };
+        };
+    };
+    OrganizationValuesController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrganizationValuesController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganizationValueDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationValueResponseDto"];
                 };
             };
         };

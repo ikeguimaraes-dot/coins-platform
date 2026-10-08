@@ -20,6 +20,7 @@ export const config = {
     "/empresas/:path*",
     "/parceiros/:path*",
     "/ofertas/:path*",
+    "/categorias-de-oferta/:path*",
     "/pedidos/:path*",
     "/cursos/:path*",
   ],
