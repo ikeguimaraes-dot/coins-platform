@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { EntityImage } from "@/components/shared/entity-image"
+import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { ApiError } from "@/lib/api/client"
 import { addLesson, updateLesson, type Lesson } from "@/lib/api/courses"
 import { minutesAndSecondsToSeconds, secondsToMinutesAndSeconds } from "@/lib/courses/duration"
@@ -58,14 +58,13 @@ export function LessonFormDialog({
 }) {
   const queryClient = useQueryClient()
   const [formError, setFormError] = React.useState<string | null>(null)
+  const [imageUploading, setImageUploading] = React.useState(false)
   const isEditing = lesson !== null
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { title: "", videoUrl: "", thumbnailUrl: "", minutes: "0", seconds: "0", displayOrder: "0" },
   })
-
-  const thumbnailUrl = form.watch("thumbnailUrl")
 
   React.useEffect(() => {
     if (!open) return
@@ -163,26 +162,17 @@ export function LessonFormDialog({
               name="thumbnailUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Miniatura (URL, opcional)</FormLabel>
-                  <FormControl>
-                    <div className="flex gap-2">
-                      <Input {...field} placeholder="https://..." autoComplete="off" />
-                      {field.value ? (
-                        <Button type="button" variant="outline" onClick={() => field.onChange("")}>
-                          Remover
-                        </Button>
-                      ) : null}
-                    </div>
-                  </FormControl>
+                  <ImageUploadField
+                    label="Miniatura da aula (opcional)"
+                    value={field.value}
+                    onChange={(url) => field.onChange(url ?? "")}
+                    pathPrefix="lessons"
+                    onUploadingChange={setImageUploading}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {thumbnailUrl?.trim() ? (
-              <div className="max-w-xs">
-                <EntityImage src={thumbnailUrl} alt="Preview da miniatura" size="large" />
-              </div>
-            ) : null}
             <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
@@ -226,8 +216,18 @@ export function LessonFormDialog({
             </div>
             {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
             <DialogFooter>
-              <Button type="submit" disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-                {mutation.isPending ? "Salvando..." : isEditing ? "Salvar aula" : "Adicionar aula"}
+              <Button
+                type="submit"
+                disabled={mutation.isPending || imageUploading}
+                className="bg-[#C63C0B] hover:bg-[#B23509]"
+              >
+                {imageUploading
+                  ? "Enviando imagem..."
+                  : mutation.isPending
+                    ? "Salvando..."
+                    : isEditing
+                      ? "Salvar aula"
+                      : "Adicionar aula"}
               </Button>
             </DialogFooter>
           </form>

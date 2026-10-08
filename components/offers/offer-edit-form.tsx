@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { EntityImage } from "@/components/shared/entity-image"
+import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { ApiError } from "@/lib/api/client"
 import { updateOffer, type OfferSummary, type UpdateOfferInput } from "@/lib/api/offers"
 import { OFFER_STATUS_OPTIONS, type OfferStatus } from "@/lib/offers/status"
@@ -31,6 +31,7 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
   const [status, setStatus] = React.useState<OfferStatus>(offer.status)
   const [confirmingDeactivate, setConfirmingDeactivate] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [imageUploading, setImageUploading] = React.useState(false)
 
   const mutation = useMutation({
     mutationFn: (input: UpdateOfferInput) => updateOffer(offer.id, input),
@@ -111,33 +112,24 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
             </Select>
           </div>
         </div>
-        <div>
-          <label className="mb-1 block text-[12px] font-semibold text-muted-foreground">Imagem (URL)</label>
-          <div className="flex gap-2">
-            <Input
-              value={imageUrl}
-              placeholder="https://..."
-              onChange={(event) => setImageUrl(event.target.value)}
-            />
-            {imageUrl ? (
-              <Button type="button" variant="outline" onClick={() => setImageUrl("")}>
-                Remover imagem
-              </Button>
-            ) : null}
-          </div>
-          {imageUrl.trim() ? (
-            <div className="mt-2 max-w-xs">
-              <EntityImage src={imageUrl} alt="Preview da oferta" size="large" />
-            </div>
-          ) : null}
-        </div>
+        <ImageUploadField
+          label="Imagem da oferta"
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? "")}
+          pathPrefix="offers"
+          onUploadingChange={setImageUploading}
+        />
       </div>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       <div className="mt-3 flex gap-2">
-        <Button onClick={handleSave} disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-          {mutation.isPending ? "Salvando..." : "Salvar"}
+        <Button
+          onClick={handleSave}
+          disabled={mutation.isPending || imageUploading}
+          className="bg-[#C63C0B] hover:bg-[#B23509]"
+        >
+          {imageUploading ? "Enviando imagem..." : mutation.isPending ? "Salvando..." : "Salvar"}
         </Button>
-        <Button variant="outline" onClick={onDone} disabled={mutation.isPending}>
+        <Button variant="outline" onClick={onDone} disabled={mutation.isPending || imageUploading}>
           Cancelar
         </Button>
       </div>

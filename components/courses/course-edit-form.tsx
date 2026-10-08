@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { EntityImage } from "@/components/shared/entity-image"
+import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { ApiError } from "@/lib/api/client"
 import { updateCourse, type CourseDetail, type UpdateCourseInput } from "@/lib/api/courses"
 
@@ -17,6 +17,7 @@ export function CourseEditForm({ course, onDone }: { course: CourseDetail; onDon
   const [coverImageUrl, setCoverImageUrl] = React.useState(course.coverImageUrl ?? "")
   const [displayOrder, setDisplayOrder] = React.useState(String(course.displayOrder))
   const [error, setError] = React.useState<string | null>(null)
+  const [imageUploading, setImageUploading] = React.useState(false)
 
   const mutation = useMutation({
     mutationFn: (input: UpdateCourseInput) => updateCourse(course.id, input),
@@ -76,33 +77,24 @@ export function CourseEditForm({ course, onDone }: { course: CourseDetail; onDon
             className="max-w-[120px]"
           />
         </div>
-        <div>
-          <label className="mb-1 block text-[12px] font-semibold text-muted-foreground">Imagem de capa (URL)</label>
-          <div className="flex gap-2">
-            <Input
-              value={coverImageUrl}
-              placeholder="https://..."
-              onChange={(event) => setCoverImageUrl(event.target.value)}
-            />
-            {coverImageUrl ? (
-              <Button type="button" variant="outline" onClick={() => setCoverImageUrl("")}>
-                Remover imagem
-              </Button>
-            ) : null}
-          </div>
-          {coverImageUrl.trim() ? (
-            <div className="mt-2 max-w-xs">
-              <EntityImage src={coverImageUrl} alt="Preview da capa" size="large" />
-            </div>
-          ) : null}
-        </div>
+        <ImageUploadField
+          label="Imagem de capa"
+          value={coverImageUrl}
+          onChange={(url) => setCoverImageUrl(url ?? "")}
+          pathPrefix="courses"
+          onUploadingChange={setImageUploading}
+        />
       </div>
       {error ? <p className="mt-2 text-sm text-destructive">{error}</p> : null}
       <div className="mt-3 flex gap-2">
-        <Button onClick={handleSave} disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-          {mutation.isPending ? "Salvando..." : "Salvar"}
+        <Button
+          onClick={handleSave}
+          disabled={mutation.isPending || imageUploading}
+          className="bg-[#C63C0B] hover:bg-[#B23509]"
+        >
+          {imageUploading ? "Enviando imagem..." : mutation.isPending ? "Salvando..." : "Salvar"}
         </Button>
-        <Button variant="outline" onClick={onDone} disabled={mutation.isPending}>
+        <Button variant="outline" onClick={onDone} disabled={mutation.isPending || imageUploading}>
           Cancelar
         </Button>
       </div>

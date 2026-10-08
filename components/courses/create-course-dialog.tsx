@@ -19,7 +19,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { EntityImage } from "@/components/shared/entity-image"
+import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { ApiError } from "@/lib/api/client"
 import { createCourse } from "@/lib/api/courses"
 
@@ -45,13 +45,12 @@ export function CreateCourseDialog({
   const router = useRouter()
   const queryClient = useQueryClient()
   const [formError, setFormError] = React.useState<string | null>(null)
+  const [imageUploading, setImageUploading] = React.useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { title: "", description: "", coverImageUrl: "", displayOrder: "0" },
   })
-
-  const coverImageUrl = form.watch("coverImageUrl")
 
   function handleOpenChange(next: boolean) {
     onOpenChange(next)
@@ -138,19 +137,25 @@ export function CreateCourseDialog({
               name="coverImageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Imagem de capa (URL, opcional)</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="https://..." autoComplete="off" />
-                  </FormControl>
+                  <ImageUploadField
+                    label="Imagem de capa (opcional)"
+                    value={field.value}
+                    onChange={(url) => field.onChange(url ?? "")}
+                    pathPrefix="courses"
+                    onUploadingChange={setImageUploading}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {coverImageUrl?.trim() ? <EntityImage src={coverImageUrl} alt="Preview da capa" size="large" /> : null}
             {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
             <DialogFooter>
-              <Button type="submit" disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-                {mutation.isPending ? "Criando..." : "Criar curso"}
+              <Button
+                type="submit"
+                disabled={mutation.isPending || imageUploading}
+                className="bg-[#C63C0B] hover:bg-[#B23509]"
+              >
+                {imageUploading ? "Enviando imagem..." : mutation.isPending ? "Criando..." : "Criar curso"}
               </Button>
             </DialogFooter>
           </form>

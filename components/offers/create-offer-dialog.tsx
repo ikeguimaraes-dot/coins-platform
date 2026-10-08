@@ -20,7 +20,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { EntityImage } from "@/components/shared/entity-image"
+import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { ApiError } from "@/lib/api/client"
 import { createOffer } from "@/lib/api/offers"
 import type { PartnerListItem } from "@/lib/api/partners"
@@ -53,13 +53,12 @@ export function CreateOfferDialog({
 }) {
   const queryClient = useQueryClient()
   const [formError, setFormError] = React.useState<string | null>(null)
+  const [imageUploading, setImageUploading] = React.useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { title: "", description: "", category: "", costInCoins: "", partnerId: "", imageUrl: "" },
   })
-
-  const imageUrl = form.watch("imageUrl")
 
   function handleOpenChange(next: boolean) {
     onOpenChange(next)
@@ -183,19 +182,25 @@ export function CreateOfferDialog({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Imagem (URL, opcional)</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="https://..." autoComplete="off" />
-                  </FormControl>
+                  <ImageUploadField
+                    label="Imagem da oferta (opcional)"
+                    value={field.value}
+                    onChange={(url) => field.onChange(url ?? "")}
+                    pathPrefix="offers"
+                    onUploadingChange={setImageUploading}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {imageUrl?.trim() ? <EntityImage src={imageUrl} alt="Preview da oferta" size="large" /> : null}
             {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
             <DialogFooter>
-              <Button type="submit" disabled={mutation.isPending} className="bg-[#C63C0B] hover:bg-[#B23509]">
-                {mutation.isPending ? "Criando..." : "Criar oferta"}
+              <Button
+                type="submit"
+                disabled={mutation.isPending || imageUploading}
+                className="bg-[#C63C0B] hover:bg-[#B23509]"
+              >
+                {imageUploading ? "Enviando imagem..." : mutation.isPending ? "Criando..." : "Criar oferta"}
               </Button>
             </DialogFooter>
           </form>
