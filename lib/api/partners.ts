@@ -21,6 +21,27 @@ export function listPartners(params: { cursor?: string; limit?: number } = {}) {
   return apiClient.get<PartnersPage>(`/platform/partners${qs ? `?${qs}` : ""}`)
 }
 
+export async function listAllPartners() {
+  const items: PartnerListItem[] = []
+  const seenCursors = new Set<string>()
+  let cursor: string | undefined
+
+  do {
+    const page = await listPartners({ cursor, limit: 100 })
+    items.push(...page.items)
+
+    if (!page.nextCursor) break
+    if (seenCursors.has(page.nextCursor)) {
+      throw new Error("A paginação de parceiros retornou um cursor repetido.")
+    }
+
+    seenCursors.add(page.nextCursor)
+    cursor = page.nextCursor
+  } while (cursor)
+
+  return items
+}
+
 export function createPartner(input: CreatePartnerInput) {
   return apiClient.post<CreatePartnerResponse>("/platform/partners", input)
 }

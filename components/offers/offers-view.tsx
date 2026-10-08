@@ -11,7 +11,7 @@ import { OfferRow } from "@/components/offers/offer-row"
 import { OffersSkeleton } from "@/components/offers/offers-skeleton"
 import { DashboardError } from "@/components/dashboard/dashboard-error"
 import { listOffers } from "@/lib/api/offers"
-import { listPartners } from "@/lib/api/partners"
+import { listAllPartners } from "@/lib/api/partners"
 
 const PAGE_SIZE = 20
 
@@ -21,9 +21,9 @@ export function OffersView() {
 
   const partnersQuery = useQuery({
     queryKey: ["partners", "for-select"],
-    queryFn: () => listPartners({ limit: 200 }),
+    queryFn: listAllPartners,
   })
-  const partners = partnersQuery.data?.items ?? []
+  const partners = partnersQuery.data ?? []
 
   const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
     queryKey: ["offers", partnerFilter],
@@ -47,30 +47,50 @@ export function OffersView() {
             </p>
           ) : null}
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-[#C63C0B] hover:bg-[#B23509]">
+        <Button
+          onClick={() => setCreateOpen(true)}
+          disabled={partnersQuery.isPending || partnersQuery.isError}
+          className="bg-[#C63C0B] hover:bg-[#B23509]"
+        >
           <Plus className="h-4 w-4" />
           Nova oferta
         </Button>
       </div>
 
-      <div className="flex items-center gap-2">
-        <label className="text-[12.5px] font-semibold text-muted-foreground" htmlFor="partner-filter">
-          Parceiro
-        </label>
-        <Select
-          id="partner-filter"
-          value={partnerFilter}
-          onChange={(event) => setPartnerFilter(event.target.value)}
-          className="w-auto min-w-[220px]"
-        >
-          <option value="">Todos os parceiros</option>
-          {partners.map((partner) => (
-            <option key={partner.id} value={partner.id}>
-              {partner.name}
-            </option>
-          ))}
-        </Select>
-      </div>
+      {partnersQuery.isError ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+          <p className="text-sm text-destructive">Não foi possível carregar os parceiros.</p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => partnersQuery.refetch()}
+            disabled={partnersQuery.isFetching}
+          >
+            {partnersQuery.isFetching ? "Tentando..." : "Tentar novamente"}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <label className="text-[12.5px] font-semibold text-muted-foreground" htmlFor="partner-filter">
+            Parceiro
+          </label>
+          <Select
+            id="partner-filter"
+            value={partnerFilter}
+            onChange={(event) => setPartnerFilter(event.target.value)}
+            disabled={partnersQuery.isPending}
+            className="w-auto min-w-[220px]"
+          >
+            <option value="">{partnersQuery.isPending ? "Carregando parceiros..." : "Todos os parceiros"}</option>
+            {partners.map((partner) => (
+              <option key={partner.id} value={partner.id}>
+                {partner.name}
+              </option>
+            ))}
+          </Select>
+        </div>
+      )}
 
       {isPending ? (
         <OffersSkeleton />
