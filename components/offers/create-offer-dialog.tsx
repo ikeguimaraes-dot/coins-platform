@@ -24,6 +24,7 @@ import { ImageUploadField } from "@/components/shared/image-upload-field"
 import { OfferCategorySelect } from "@/components/offers/offer-category-select"
 import { ApiError } from "@/lib/api/client"
 import { createOffer } from "@/lib/api/offers"
+import { offerValidityDateToIso } from "@/lib/offers/date"
 import type { PartnerListItem } from "@/lib/api/partners"
 
 const schema = z.object({
@@ -115,7 +116,7 @@ export function CreateOfferDialog({
       costInCoins: Number(values.costInCoins),
       originalCost: values.originalCost ? Number(values.originalCost) : undefined,
       featured: values.featured,
-      validUntil: values.validUntil ? new Date(values.validUntil).toISOString() : undefined,
+      validUntil: values.validUntil ? offerValidityDateToIso(values.validUntil) : undefined,
       partnerId: values.partnerId,
       imageUrl: values.imageUrl?.trim() ? values.imageUrl.trim() : undefined,
     })
@@ -203,7 +204,7 @@ export function CreateOfferDialog({
                   <FormItem>
                     <FormLabel>Validade (opcional)</FormLabel>
                     <FormControl>
-                      <Input {...field} type="datetime-local" />
+                      <Input {...field} type="date" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

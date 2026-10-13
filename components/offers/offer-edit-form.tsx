@@ -22,7 +22,7 @@ import { OfferCategorySelect } from "@/components/offers/offer-category-select"
 import { ApiError } from "@/lib/api/client"
 import { updateOffer, type OfferSummary, type UpdateOfferInput } from "@/lib/api/offers"
 import { OFFER_STATUS_OPTIONS, type OfferStatus } from "@/lib/offers/status"
-import { datetimeLocalToIso, isoToDatetimeLocal } from "@/lib/offers/date"
+import { offerValidityDateToIso, offerValidityIsoToDate } from "@/lib/offers/date"
 
 export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: () => void }) {
   const queryClient = useQueryClient()
@@ -32,7 +32,7 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
   const [originalCost, setOriginalCost] = React.useState(offer.originalCost ? String(offer.originalCost) : "")
   const [category, setCategory] = React.useState(offer.category)
   const [featured, setFeatured] = React.useState(offer.featured)
-  const initialValidUntil = isoToDatetimeLocal(offer.validUntil)
+  const initialValidUntil = offerValidityIsoToDate(offer.validUntil)
   const [validUntil, setValidUntil] = React.useState(initialValidUntil)
   const [imageUrl, setImageUrl] = React.useState(offer.imageUrl ?? "")
   const [status, setStatus] = React.useState<OfferStatus>(offer.status)
@@ -65,7 +65,7 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
     if (parsedOriginalCost !== offer.originalCost) input.originalCost = parsedOriginalCost
     if (category !== offer.category) input.category = category
     if (featured !== offer.featured) input.featured = featured
-    if (validUntil !== initialValidUntil) input.validUntil = datetimeLocalToIso(validUntil)
+    if (validUntil !== initialValidUntil) input.validUntil = offerValidityDateToIso(validUntil)
 
     const trimmedImageUrl = imageUrl.trim()
     const currentImageUrl = offer.imageUrl ?? ""
@@ -150,7 +150,7 @@ export function OfferEditForm({ offer, onDone }: { offer: OfferSummary; onDone: 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1 block text-[12px] font-semibold text-muted-foreground">Validade (opcional)</label>
-            <Input type="datetime-local" value={validUntil} onChange={(event) => setValidUntil(event.target.value)} />
+            <Input type="date" value={validUntil} onChange={(event) => setValidUntil(event.target.value)} />
           </div>
           <label className="flex cursor-pointer items-center gap-2 self-end pb-2 text-sm font-medium">
             <input
